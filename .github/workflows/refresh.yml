@@ -1,0 +1,44 @@
+﻿name: Refresh Garmin data
+on:
+  schedule:
+    - cron: "0 5,17 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            raw
+            ~/.garminconnect
+          key: garmin-${{ github.run_id }}
+          restore-keys: garmin-
+      - name: Garmin tokens
+        env:
+          GARMIN_TOKENS: ${{ secrets.GARMIN_TOKENS }}
+        run: |
+          mkdir -p ~/.garminconnect
+          [ -f ~/.garminconnect/garmin_tokens.json ] || printf '%s' "$GARMIN_TOKENS" > ~/.garminconnect/garmin_tokens.json
+      - name: Fetch and build
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          uv run --python 3.12 --with mcp python fetch.py
+          uv run --python 3.12 --with mcp python fetch_details.py
+          uv run --python 3.12 python build.py
+      - name: Publish
+        run: |
+          git config user.name "garmin-dashboard-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data.js
+          git diff --cached --quiet || { git commit -qm "Mise a jour $(date -u +'%Y-%m-%d %H:%M') UTC"; git pull --rebase -q; git push -q; }
