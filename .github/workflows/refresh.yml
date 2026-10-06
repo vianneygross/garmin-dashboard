@@ -34,7 +34,9 @@ jobs:
           PYTHONIOENCODING: utf-8
         run: |
           uv run --python 3.12 --with mcp python fetch.py
+          uv run --python 3.12 python check_fetch.py
           uv run --python 3.12 --with mcp python fetch_details.py
+          uv run --python 3.12 python check_fetch.py
           uv run --python 3.12 python build.py
       - name: Publish
         run: |
