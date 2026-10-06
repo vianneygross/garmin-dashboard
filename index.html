@@ -32,6 +32,7 @@ a{color:inherit}
 
 header.top{position:sticky;top:0;z-index:30;padding:0 clamp(12px,2vw,28px);background:color-mix(in srgb,var(--paper) 72%,transparent);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid color-mix(in srgb,var(--rule-2) 60%,transparent)}
 header.top .in{max-width:1760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:50px;padding:7px 0}
+.refresh{color:var(--mute);text-decoration:none;font-size:1.15rem;line-height:1;padding:4px 6px;border-radius:8px}.refresh:hover{background:var(--card-2);color:inherit}
 .brand{font-weight:700;font-size:1.05rem;letter-spacing:-.02em;text-decoration:none}
 .sync{display:none}
 .seg{display:inline-flex;background:color-mix(in srgb,var(--mute) 16%,transparent);border-radius:10px;padding:2px}
@@ -154,6 +155,7 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
       <button data-d="365">1 an</button>
       <button data-d="0">Tout</button>
     </div>
+    <a class="refresh" href="https://github.com/vianneygross/garmin-dashboard/actions/workflows/refresh.yml" target="_blank" rel="noopener" title="Ouvrir GitHub puis Run workflow pour actualiser les donn&eacute;es" aria-label="Actualiser les donn&eacute;es">&#8635;</a>
   </div>
 </header>
 <div class="wrap" id="top">
