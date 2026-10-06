@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard</title>
+<style>
+:root{
+  color-scheme:light dark;
+  --paper:#f5f5f7; --card:#ffffff; --card-2:#f5f5f7; --ink:#1d1d1f; --ink-2:#424245; --mute:#6e6e73; --mute-2:#86868b;
+  --rule:#e8e8ed; --rule-2:#d2d2d7;
+  --run:#ff375f; --run-soft:#ffc7d3;
+  --cool:#0a7aff; --cool-soft:#b8d9ff;
+  --ochre:#ff9f0a; --green:#28b94d;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 28px -12px rgba(0,0,0,.12);
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI Variable Display","Segoe UI Variable Text","Segoe UI",Inter,system-ui,sans-serif;
+  --serif:var(--sans);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#000; --card:#1c1c1e; --card-2:#2c2c2e; --ink:#f5f5f7; --ink-2:#d1d1d6; --mute:#a1a1a6; --mute-2:#8e8e93;
+  --rule:#2c2c2e; --rule-2:#3a3a3c;
+  --run:#ff4f73; --run-soft:#6b2a39; --cool:#2f8fff; --cool-soft:#1e4a7d; --ochre:#ffb340; --green:#32d74b;
+  --shadow:0 0 0 1px rgba(255,255,255,.04);
+}}
+*{box-sizing:border-box}
+html{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;-webkit-text-size-adjust:100%}
+body{margin:0;padding:0 0 96px}
+.wrap{padding:0 clamp(16px,4vw,48px)}
+.wrap{max-width:1680px;margin:0 auto}
+
+a{color:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--cool) 55%,transparent);outline-offset:2px;border-radius:8px}
+.num{font-variant-numeric:tabular-nums lining-nums}
+
+/* barre sticky façon apple.com */
+header.top{position:sticky;top:0;z-index:30;margin:0;padding:0 clamp(16px,4vw,48px);background:color-mix(in srgb,var(--paper) 72%,transparent);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid color-mix(in srgb,var(--rule-2) 60%,transparent)}
+header.top .in{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:56px;padding:8px 0}
+.brand{font-weight:600;font-size:1.05rem;letter-spacing:-.01em;margin:0}
+.sync{display:none}
+.seg{display:inline-flex;background:color-mix(in srgb,var(--mute) 16%,transparent);border-radius:10px;padding:2px;gap:0}
+.seg button{font:inherit;font-size:.82rem;font-weight:500;border:0;background:transparent;color:var(--ink);padding:6px 14px;border-radius:8px;cursor:pointer;min-height:32px;transition:background .25s var(--ease),box-shadow .25s var(--ease)}
+.seg button[aria-pressed="true"]{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.05)}
+@media (prefers-color-scheme:dark){.seg button[aria-pressed="true"]{background:#636366;color:#fff}}
+
+/* hero */
+.hero{padding:clamp(48px,9vw,96px) 0 clamp(28px,5vw,48px);text-align:center}
+.hero h1{font-size:clamp(2.5rem,7vw,5rem);line-height:1.04;font-weight:700;letter-spacing:-.035em;margin:0 auto;max-width:15ch;text-wrap:balance}
+.lead{font-size:clamp(1.15rem,2.2vw,1.55rem);line-height:1.35;color:var(--mute);font-weight:500;letter-spacing:-.01em;margin:20px auto 0;max-width:34ch;text-wrap:balance}
+.lead b{color:var(--ink);font-weight:600}
+.syncline{color:var(--mute-2);font-size:.9rem;margin:16px 0 0}
+
+/* tuiles de chiffres */
+.facts{margin:0 0 8px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.facts>div{background:var(--card);border-radius:24px;padding:22px 24px 20px;box-shadow:var(--shadow)}
+.facts dt{font-size:.85rem;font-weight:600;color:var(--mute);margin:0 0 6px}
+.facts dd{margin:0;font-size:clamp(1.7rem,3.4vw,2.4rem);line-height:1.05;font-weight:700;letter-spacing:-.03em}
+.facts small{display:block;font-size:.8rem;font-weight:500;color:var(--mute-2);margin-top:8px}
+.up{color:var(--green)!important} .down{color:var(--run)!important}
+
+/* sections */
+section.row{display:block;padding:0;margin:clamp(56px,9vw,104px) 0 0;border:0}
+.side{max-width:760px;margin:0 0 22px}
+.side h2{font-size:clamp(1.8rem,3.6vw,2.7rem);line-height:1.08;font-weight:700;letter-spacing:-.03em;margin:0 0 12px}
+.side p{margin:0 0 8px;color:var(--ink-2);font-size:1.05rem;line-height:1.45;text-wrap:pretty;letter-spacing:-.005em}
+.side p b{color:var(--ink);font-weight:600}
+.side p.note{font-size:.9rem;color:var(--mute-2)}
+section.row>div:not(.side){display:grid;gap:14px}
+.plot{position:relative;min-width:0;background:var(--card);border-radius:28px;padding:22px clamp(14px,3vw,28px) 18px;box-shadow:var(--shadow)}
+.plot+.plot{margin-top:0}
+.plot .cap{font-size:.85rem;color:var(--mute);margin:0 0 12px;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+.plot .cap strong{color:var(--ink);font-weight:600;font-size:1rem;letter-spacing:-.01em}
+.key{display:inline-flex;align-items:center;gap:7px}
+.key i{width:14px;height:0;border-top:3px solid currentColor;border-radius:2px;display:inline-block}
+.key i.dot{width:10px;height:10px;border:0;border-radius:50%;background:currentColor}
+.key i.box{width:10px;height:10px;border:0;border-radius:3px;background:currentColor}
+svg{display:block;width:100%;overflow:visible}
+svg text{font-family:var(--sans);font-size:12px;fill:var(--mute-2)}
+svg .grid{stroke:var(--rule);stroke-width:1}
+svg .axis{stroke:var(--rule-2)}
+[data-tip]{cursor:default}
+.bar{transform-box:fill-box;transform-origin:50% 100%;animation:rise 1s var(--ease) both}
+@keyframes rise{from{transform:scaleY(.02);opacity:.2}to{transform:none;opacity:1}}
+.tip{position:fixed;z-index:60;pointer-events:none;background:color-mix(in srgb,var(--ink) 92%,transparent);color:var(--paper);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:.82rem;line-height:1.4;padding:9px 12px;border-radius:12px;max-width:260px;opacity:0;transform:translateY(4px) scale(.98);transition:opacity .15s,transform .2s var(--ease);box-shadow:0 12px 30px -8px rgba(0,0,0,.35)}
+.tip.on{opacity:1;transform:none}
+.tip b{font-weight:600}
+
+.bullets{display:grid;gap:18px}
+.bullet .l{display:flex;justify-content:space-between;gap:12px;font-size:.9rem;margin-bottom:6px;flex-wrap:wrap}
+.bullet .l span:first-child{font-weight:600}
+.bullet .l span:last-child{color:var(--mute)}
+.bullet svg{height:22px}
+
+.preds{width:100%;border-collapse:collapse;font-size:.95rem}
+.preds th{font-weight:500;font-size:.8rem;color:var(--mute);text-align:left;padding:0 12px 10px 0;border-bottom:1px solid var(--rule-2);line-height:1.3}
+.preds td{padding:14px 12px 14px 0;border-bottom:1px solid var(--rule);line-height:1.3}
+.preds tr:last-child td{border-bottom:0}
+.preds td:first-child{font-weight:600;font-size:1.05rem;letter-spacing:-.01em}
+.preds td:nth-child(2){font-weight:700;font-size:1.15rem;letter-spacing:-.02em}
+.preds small{color:var(--mute-2);font-size:.78rem}
+
+.tools{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-bottom:16px}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 calc(-1*clamp(14px,3vw,28px));padding:0 clamp(14px,3vw,28px)}
+table.log{width:100%;border-collapse:collapse;font-size:.92rem;min-width:620px}
+table.log th{font-weight:500;font-size:.8rem;color:var(--mute);text-align:right;padding:0 10px 10px;border-bottom:1px solid var(--rule-2);white-space:nowrap}
+table.log th:first-child,table.log th:nth-child(2){text-align:left;padding-left:0}
+table.log td{padding:12px 10px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+table.log td:first-child,table.log td:nth-child(2){text-align:left}
+table.log td:first-child{padding-left:0;color:var(--mute)}
+table.log td:nth-child(2){max-width:260px;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+table.log tr.race td:first-child{box-shadow:none;color:var(--run);font-weight:600}
+table.log tr:hover td{background:var(--card-2)}
+.badge{display:inline-block;font-size:.7rem;font-weight:600;background:color-mix(in srgb,var(--run) 14%,transparent);color:var(--run);border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:1px}
+.more{font:inherit;font-weight:500;font-size:.92rem;background:color-mix(in srgb,var(--cool) 12%,transparent);color:var(--cool);border:0;border-radius:999px;padding:10px 20px;margin-top:18px;cursor:pointer;min-height:40px;transition:background .2s}
+.more:hover{background:color-mix(in srgb,var(--cool) 20%,transparent)}
+footer{margin-top:88px;padding-top:20px;border-top:1px solid var(--rule-2);color:var(--mute-2);font-size:.82rem;max-width:70ch;line-height:1.5}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.empty{color:var(--mute);padding:28px 0}
+
+@media (max-width:760px){
+  .facts{grid-template-columns:repeat(2,1fr);gap:10px}
+  .facts>div{border-radius:20px;padding:18px 18px 16px}
+  .plot{border-radius:22px}
+  .brand{font-size:.95rem}
+}
+@media (max-width:420px){.seg button{padding:6px 9px;font-size:.78rem}}
+@media (prefers-reduced-motion:reduce){.bar{animation:none}.tip{transition:none}.seg button{transition:none}}
+html{scroll-behavior:smooth;scroll-padding-top:120px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+header.top .in{max-width:1680px}
+.toc{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:0 0 8px;margin:0 -6px}
+.toc::-webkit-scrollbar{display:none}
+.toc a{flex:none;text-decoration:none;font-size:.85rem;font-weight:500;color:var(--mute);padding:6px 12px;border-radius:999px;transition:background .2s,color .2s;white-space:nowrap}
+.toc a:hover{color:var(--ink)}
+.toc a[aria-current="true"]{background:var(--ink);color:var(--paper)}
+.bilan{padding-top:clamp(28px,5vw,56px)}
+.lead{max-width:none!important;margin:0 0 28px!important;text-align:left!important;font-size:clamp(1.4rem,3vw,2.4rem)!important;line-height:1.2!important;text-wrap:pretty!important}
+.facts{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important}
+.wrap .side{max-width:none}
+@media (min-width:1100px){
+  .wrap section.row{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:start}
+  .wrap section.row>.side{position:sticky;top:130px;margin:0}
+  .wrap section.row>.plot{grid-column:2}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <a class="brand" href="#top">Dashboard</a>
+    <p class="sync" id="sync"></p>
+    <div class="seg" role="group" aria-label="Période affichée" id="range">
+      <button data-d="90">3 mois</button>
+      <button data-d="180">6 mois</button>
+      <button data-d="365">1 an</button>
+      <button data-d="0">Tout</button>
+    </div>
+  </div>
+  <nav class="toc" aria-label="Sections" id="toc"></nav>
+</header>
+<div class="wrap" id="top">
+
+
+<div class="bilan">
+  <p class="lead" id="lead"></p>
+  <dl class="facts" id="facts"></dl>
+</div>
+
+<section class="row" aria-labelledby="t-mara">
+  <div class="side">
+    <h2 id="t-mara">Marathon de Paris</h2>
+    <div id="mara-text"></div>
+  </div>
+  <div>
+    <dl class="facts" id="mara-facts"></dl>
+    <div class="plot"><p class="cap"><strong>Ce que ton allure de course dit du marathon</strong><span>projection de Riegel, toujours un peu optimiste</span></p><table class="preds" id="mara-pred"></table></div>
+    <div class="plot"><p class="cap"><strong>Pr&eacute;pa d'Annecy vs maintenant</strong></p><table class="preds" id="mara-cmp"></table></div>
+    <div class="plot"><p class="cap"><span class="key" style="color:var(--cool)"><i class="box"></i>km par semaine r&eacute;alis&eacute;s</span><span class="key" style="color:var(--cool-soft)"><i class="box"></i>trajectoire possible</span><span class="key" style="color:var(--run)"><i class="box"></i>semaine de la course</span><span class="key" style="color:var(--run)"><i class="box"></i>point : r&eacute;alis&eacute; sur une semaine du plan</span></p><div id="c-mara" role="img" aria-label="Volume hebdomadaire r&eacute;alis&eacute; et trajectoire jusqu'au marathon"></div></div>
+    <div class="plot"><p class="cap"><strong>Pr&eacute;vu vs r&eacute;alis&eacute;</strong></p><table class="preds" id="mara-track"></table></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-vol">
+  <div class="side">
+    <h2 id="t-vol">Volume</h2>
+    <div id="vol-text"></div>
+  </div>
+  <div class="plot">
+    <p class="cap"><span class="key" style="color:var(--cool)"><i class="box"></i>km par semaine</span><span class="key" style="color:var(--ink)"><i></i>moyenne sur 4 semaines</span><span class="key" style="color:var(--run)"><i class="box"></i>semaine avec course</span></p>
+    <div id="c-vol" role="img" aria-label="Kilomètres courus par semaine"></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-pace">
+  <div class="side">
+    <h2 id="t-pace">Allure</h2>
+    <div id="pace-text"></div>
+  </div>
+  <div class="plot">
+    <p class="cap"><span class="key" style="color:var(--mute-2)"><i class="dot"></i>sortie (taille = distance)</span><span class="key" style="color:var(--run)"><i class="dot"></i>course</span><span class="key" style="color:var(--cool)"><i></i>footings, médiane glissante</span></p>
+    <div id="c-pace" role="img" aria-label="Allure de chaque sortie dans le temps"></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-int">
+  <div class="side">
+    <h2 id="t-int">Intensité</h2>
+    <div id="int-text"></div>
+  </div>
+  <div class="plot">
+    <p class="cap"><span class="key" style="color:var(--cool-soft)"><i class="box"></i>&lt; 140 bpm</span><span class="key" style="color:var(--cool)"><i class="box"></i>140–149</span><span class="key" style="color:var(--ochre)"><i class="box"></i>150–159</span><span class="key" style="color:var(--run)"><i class="box"></i>≥ 160</span><span>FC moyenne de la sortie, km par mois</span></p>
+    <div id="c-int" role="img" aria-label="Kilomètres par mois selon la fréquence cardiaque moyenne"></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-zone">
+  <div class="side">
+    <h2 id="t-zone">Zones cardiaques</h2>
+    <div id="zone-text"></div>
+  </div>
+  <div class="plot">
+    <p class="cap"><span class="key" style="color:var(--cool-soft)"><i class="box"></i>Z1</span><span class="key" style="color:var(--cool)"><i class="box"></i>Z2</span><span class="key" style="color:var(--green)"><i class="box"></i>Z3</span><span class="key" style="color:var(--ochre)"><i class="box"></i>Z4</span><span class="key" style="color:var(--run)"><i class="box"></i>Z5</span><span>heures par mois, temps réel passé dans chaque zone</span></p>
+    <div id="c-zone" role="img" aria-label="Temps par zone de fréquence cardiaque et par mois"></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-te">
+  <div class="side">
+    <h2 id="t-te">Effort des séances</h2>
+    <div id="te-text"></div>
+  </div>
+  <div class="plot">
+    <p class="cap"><span class="key" style="color:var(--cool)"><i class="box"></i>effet aérobie (0–5)</span><span class="key" style="color:var(--run)"><i class="dot"></i>effet anaérobie</span><span>40 dernières sorties</span></p>
+    <div id="c-te" role="img" aria-label="Training effect des dernières sorties"></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-form">
+  <div class="side">
+    <h2 id="t-form">Foulée</h2>
+    <div id="form-text"></div>
+  </div>
+  <div>
+    <div class="plot"><p class="cap"><strong>Cadence</strong><span>pas par minute</span></p><div id="c-cad" role="img" aria-label="Cadence"></div></div>
+    <div class="plot"><p class="cap"><strong>Temps de contact au sol</strong><span>millisecondes, plus bas = plus nerveux</span></p><div id="c-gct" role="img" aria-label="Temps de contact au sol"></div></div>
+    <div class="plot"><p class="cap"><strong>Oscillation verticale</strong><span>centimètres, plus bas = plus économe</span></p><div id="c-vo" role="img" aria-label="Oscillation verticale"></div></div>
+    <div class="plot"><p class="cap"><strong>Puissance de course</strong><span>watts moyens</span></p><div id="c-pow" role="img" aria-label="Puissance"></div></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-eff">
+  <div class="side">
+    <h2 id="t-eff">Efficacité</h2>
+    <div id="eff-text"></div>
+  </div>
+  <div>
+    <div class="plot"><p class="cap"><strong>Mètres par battement</strong><span class="key" style="color:var(--cool)"><i></i>footings, médiane glissante · plus haut = plus efficace</span></p><div id="c-eff" role="img" aria-label="Efficacité cardiaque"></div></div>
+    <div class="plot"><p class="cap"><strong>Dérive cardiaque</strong><span>sorties régulières de 7 km et plus · sous 5 % = bon</span></p><div id="c-dec" role="img" aria-label="Dérive cardiaque"></div></div>
+    <div class="plot"><p class="cap"><strong id="laps-title">Dernière sortie longue</strong><span class="key" style="color:var(--cool)"><i class="box"></i>allure par km</span><span class="key" style="color:var(--run)"><i class="dot"></i>FC</span></p><div id="c-laps" role="img" aria-label="Allure par kilomètre"></div></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-meteo">
+  <div class="side">
+    <h2 id="t-meteo">Conditions</h2>
+    <div id="meteo-text"></div>
+  </div>
+  <div class="plot">
+    <p class="cap"><span class="key" style="color:var(--mute-2)"><i class="dot"></i>footing</span><span>mètres par battement selon la température</span></p>
+    <div id="c-meteo" role="img" aria-label="Efficacité selon la température"></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-load">
+  <div class="side">
+    <h2 id="t-load">Charge et forme</h2>
+    <div id="load-text"></div>
+  </div>
+  <div>
+    <div class="plot">
+      <p class="cap"><span class="key" style="color:var(--cool)"><i></i>charge chronique (forme de fond)</span><span class="key" style="color:var(--run)"><i></i>charge aiguë (fatigue récente)</span><span class="key" style="color:var(--cool-soft)"><i class="box"></i>zone optimale</span></p>
+      <div id="c-load" role="img" aria-label="Charge aiguë et chronique"></div>
+    </div>
+    <div class="plot">
+      <p class="cap"><strong>Équilibre de la charge sur 4 semaines</strong><span>bande claire = cible</span></p>
+      <div class="bullets" id="balance"></div>
+    </div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-rec">
+  <div class="side">
+    <h2 id="t-rec">Récupération</h2>
+    <div id="rec-text"></div>
+  </div>
+  <div>
+    <div class="plot">
+      <p class="cap"><span class="key" style="color:var(--cool-soft)"><i class="dot"></i>VFC de la nuit</span><span class="key" style="color:var(--cool)"><i></i>moyenne 7 jours</span></p>
+      <div id="c-hrv" role="img" aria-label="Variabilité de la fréquence cardiaque"></div>
+    </div>
+    <div class="plot">
+      <p class="cap"><strong>Sommeil, 30 dernières nuits</strong><span class="key" style="color:var(--mute)"><i></i>7 h</span><span class="key" style="color:var(--ochre)"><i class="box"></i>moins de 7 h</span></p>
+      <div id="c-sleep" role="img" aria-label="Durée de sommeil par nuit"></div>
+    </div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-body">
+  <div class="side">
+    <h2 id="t-body">Corps</h2>
+    <div id="body-text"></div>
+  </div>
+  <div>
+    <div class="plot"><p class="cap"><strong>Fréquence cardiaque au repos</strong><span>bpm</span></p><div id="c-rhr" role="img" aria-label="FC au repos"></div></div>
+    <div class="plot"><p class="cap"><strong>Minutes d'intensité par semaine</strong><span class="key" style="color:var(--mute)"><i></i>objectif</span></p><div id="c-int2" role="img" aria-label="Minutes d'intensité"></div></div>
+    <div class="plot"><p class="cap"><strong>Body Battery</strong><span>énergie rechargée chaque jour</span></p><div id="c-bb" role="img" aria-label="Body battery"></div></div>
+    <div class="plot"><p class="cap"><strong>Poids</strong><span>kg</span></p><div id="c-weight" role="img" aria-label="Poids"></div></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-perf">
+  <div class="side">
+    <h2 id="t-perf">Niveau</h2>
+    <div id="perf-text"></div>
+  </div>
+  <div>
+    <div class="plot">
+      <p class="cap"><strong>VO₂ max</strong><span>estimation Garmin</span></p>
+      <div id="c-vo2" role="img" aria-label="VO2 max dans le temps"></div>
+    </div>
+    <div class="plot">
+      <table class="preds" id="preds"></table>
+    </div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-rec2">
+  <div class="side">
+    <h2 id="t-rec2">Records</h2>
+    <div id="rec2-text"></div>
+  </div>
+  <div>
+    <div class="plot"><table class="preds" id="records"></table></div>
+  </div>
+</section>
+
+<section class="row" aria-labelledby="t-log">
+  <div class="side">
+    <h2 id="t-log">Journal</h2>
+    <div id="log-text"></div>
+  </div>
+  <div class="plot">
+    <div class="tools"><div class="seg" role="group" aria-label="Filtrer les sorties" id="filter">
+      <button data-f="all">Toutes</button><button data-f="race">Courses</button><button data-f="easy">Footings &lt; 150 bpm</button><button data-f="long">Sorties ≥ 15 km</button>
+    </div></div>
+    <div class="tablewrap"><table class="log" id="log"></table></div>
+    <button class="more" id="more" hidden>Afficher plus</button>
+  </div>
+</section>
+
+<footer>Données lues sur Garmin Connect via le serveur MCP garmin_mcp, mises en cache sur cet ordinateur. Pour actualiser, lance <span class="num">refresh.ps1</span>. Les allures utilisent le temps en mouvement. La FC moyenne est celle de la sortie entière.</footer>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script src="data.js" charset="utf-8"></script>
+<script>
+(()=>{
+const D=window.DATA||{runs:[]};
+const $=s=>document.querySelector(s);
+const NS='http://www.w3.org/2000/svg';
+const C={ink:'var(--ink)',ink2:'var(--mute-2)',mute:'var(--mute)',rule:'var(--rule)',run:'var(--run)',runSoft:'var(--run-soft)',cool:'var(--cool)',coolSoft:'var(--cool-soft)',ochre:'var(--ochre)',green:'var(--green)',card:'var(--card)'};
+
+/* ---------- helpers ---------- */
+const DAY=864e5;
+const t=s=>Date.parse(s+'T00:00:00Z');
+const iso=ms=>new Date(ms).toISOString().slice(0,10);
+const fmtD=(s,o={day:'numeric',month:'short'})=>new Date(t(s)).toLocaleDateString('fr-FR',{...o,timeZone:'UTC'}).replace(/\.(?=\s|$)/g,'');
+const fmtDY=s=>fmtD(s,{day:'numeric',month:'short',year:'numeric'});
+const mmss=sec=>{sec=Math.round(sec);return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')};
+const hms=sec=>{sec=Math.round(sec);const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:`${m}:${String(s).padStart(2,'0')}`};
+const hm=sec=>{const h=Math.floor(sec/3600),m=Math.round(sec%3600/60);return h?`${h} h ${String(m).padStart(2,'0')}`:`${m} min`};
+const f1=n=>n.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const f0=n=>Math.round(n).toLocaleString('fr-FR');
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const avg=a=>a.length?sum(a)/a.length:NaN;
+const median=a=>{if(!a.length)return NaN;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const weekStart=s=>{const ms=t(s);const dow=(new Date(ms).getUTCDay()+6)%7;return iso(ms-dow*DAY)};
+const pace=r=>r.sec/r.km;
+const isRace=r=>r.event==='race';
+const el=(tag,attrs={},kids=[])=>{const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);(Array.isArray(kids)?kids:[kids]).forEach(c=>c!=null&&n.append(c.nodeType?c:document.createTextNode(c)));return n};
+const lin=(d0,d1,r0,r1)=>v=>d1===d0?(r0+r1)/2:r0+(v-d0)/(d1-d0)*(r1-r0);
+function ticks(min,max,n=5){
+  const span=max-min||1,raw=span/n,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p;
+  const step=(f<1.5?1:f<3?2:f<7?5:10)*p,out=[];
+  for(let v=Math.ceil(min/step)*step;v<=max+1e-9;v+=step)out.push(+v.toFixed(10));
+  return out;
+}
+function mount(id,height,draw){
+  const host=$(id);
+  const run=()=>{
+    const w=host.clientWidth;if(!w)return;
+    host.replaceChildren();
+    const svg=el('svg',{width:w,height,viewBox:`0 0 ${w} ${height}`,'aria-hidden':'true'});
+    host.append(svg);draw(svg,w,height);
+  };
+  host._run=run;run();
+  if(!host._ro){let last=host.clientWidth;host._ro=new ResizeObserver(()=>{if(Math.abs(host.clientWidth-last)>2){last=host.clientWidth;host._run()}});host._ro.observe(host)}
+}
+const tipEl=$('#tip');
+function tip(html,x,y){tipEl.innerHTML=html;tipEl.classList.add('on');const r=tipEl.getBoundingClientRect();let left=x+14,top=y-r.height-12;if(left+r.width>innerWidth-8)left=x-r.width-14;if(top<8)top=y+16;tipEl.style.left=left+'px';tipEl.style.top=top+'px'}
+document.addEventListener('pointermove',e=>{const n=e.target.closest&&e.target.closest('[data-tip]');if(n)tip(n.getAttribute('data-tip'),e.clientX,e.clientY);else tipEl.classList.remove('on')});
+document.addEventListener('pointerdown',e=>{const n=e.target.closest&&e.target.closest('[data-tip]');if(n)tip(n.getAttribute('data-tip'),e.clientX,e.clientY);else tipEl.classList.remove('on')});
+const prose=(id,paras)=>{$(id).innerHTML=paras.map((p,i)=>`<p${i&&p.startsWith('~')?' class="note"':''}>${p.replace(/^~/,'')}</p>`).join('')};
+const rotate=(s,x,y)=>el('text',{x,y,'text-anchor':'end',transform:`rotate(-35 ${x} ${y})`},s);
+
+/* ---------- state ---------- */
+const runsAll=D.runs.filter(r=>r.km>=0.8);
+const today=D.generated?D.generated.slice(0,10):iso(Date.now());
+let rangeDays=180,filter='all',logLimit=20;
+
+$('#sync').textContent=`Dernière synchronisation le ${fmtDY(today)}. ${runsAll.length} sorties de course depuis le ${fmtDY(runsAll[0]?.date||today)}.`;
+
+const inRange=(date,days=rangeDays)=>days===0||t(date)>=t(today)-days*DAY;
+const sel=()=>runsAll.filter(r=>inRange(r.date));
+const prevSel=()=>rangeDays===0?[]:runsAll.filter(r=>t(r.date)<t(today)-rangeDays*DAY&&t(r.date)>=t(today)-2*rangeDays*DAY);
+
+/* ---------- weeks ---------- */
+function weeks(runs){
+  if(!runs.length)return[];
+  const first=weekStart(runs[0].date),last=weekStart(today),out=[];
+  const m=new Map();
+  runs.forEach(r=>{const k=weekStart(r.date);if(!m.has(k))m.set(k,{km:0,n:0,race:false,sec:0});const w=m.get(k);w.km+=r.km;w.n++;w.sec+=r.sec;if(isRace(r))w.race=true});
+  for(let ms=t(first);ms<=t(last);ms+=7*DAY){const k=iso(ms);out.push({k,...(m.get(k)||{km:0,n:0,race:false,sec:0})})}
+  return out;
+}
+const weeksAll=weeks(runsAll);
+
+/* ---------- bilan ---------- */
+function renderBilan(){
+  const R=sel(),P=prevSel();
+  const km=sum(R.map(r=>r.km)),secs=sum(R.map(r=>r.sec)),elev=sum(R.map(r=>r.elev||0));
+  const hrR=R.filter(r=>r.hr);
+  const hr=sum(hrR.map(r=>r.hr*r.sec))/(sum(hrR.map(r=>r.sec))||1);
+  const pk=sum(P.map(r=>r.km));
+  const delta=(a,b,unit,invert)=>{if(!b)return'';const d=(a-b)/b*100;const good=invert?d<0:d>0;return `<small class="${Math.abs(d)<1?'':good?'up':'down'}">${d>0?'+':''}${f0(d)} % vs période précédente</small>`};
+  const label=rangeDays?`${rangeDays===90?'3 mois':rangeDays===180?'6 mois':'12 mois'}`:'tout l\'historique';
+  const facts=[
+    ['Sorties',R.length,P.length?delta(R.length,P.length):''],
+    ['Distance',`${f0(km)} km`,delta(km,pk)],
+    ['Temps',hm(secs),P.length?delta(secs,sum(P.map(r=>r.sec))):''],
+    ['Allure moyenne',R.length?`${mmss(secs/km)}/km`:'–',P.length?delta(secs/km,sum(P.map(r=>r.sec))/sum(P.map(r=>r.km)),'',true):''],
+    ['FC moyenne',hr?`${f0(hr)} bpm`:'–',''],
+    ['Dénivelé',`${f0(elev)} m`,'']
+  ];
+  $('#facts').innerHTML=facts.map(([a,b,c])=>`<div><dt>${a}</dt><dd class="num">${b}</dd>${c}</div>`).join('');
+
+  // lead sentence
+  const W=weeksAll.slice(0,-1);
+  const last4=W.slice(-4),prev4=W.slice(-8,-4);
+  const a4=avg(last4.map(w=>w.km)),p4=avg(prev4.map(w=>w.km));
+  const peak=W.slice(-26).reduce((m,w)=>w.km>m.km?w:m,{km:0});
+  const cur=weeksAll[weeksAll.length-1];
+  let s=`Sur ${label}, tu as couru <b>${f0(km)} km</b> en ${R.length} sorties.`;
+  if(last4.length===4&&prev4.length===4){
+    const d=(a4-p4)/p4*100;
+    s+=` Ces quatre dernières semaines, ${Math.abs(d)<5?'ton volume est stable':d>0?`ton volume monte de ${f0(d)} %`:`ton volume baisse de ${f0(-d)} %`}, à ${f0(a4)} km par semaine.`;
+  }
+  $('#lead').innerHTML=s;
+}
+
+/* ---------- volume ---------- */
+function renderVolume(){
+  const all=weeksAll;
+  const W=all.filter(w=>inRange(w.k));
+  const idx=w=>all.indexOf(w);
+  const ma=w=>{const i=idx(w);const sl=all.slice(Math.max(0,i-3),i+1);return avg(sl.map(x=>x.km))};
+  const full=W.filter(w=>w.k!==weekStart(today));
+  const peak=full.reduce((m,w)=>w.km>m.km?w:m,{km:0});
+  const cur=all[all.length-1];
+  const lastFull=all[all.length-2];
+  const p=[];
+  if(peak.km) p.push(`Pic de la période : <b>${f0(peak.km)} km</b> la semaine du ${fmtD(peak.k)}.`);
+  if(lastFull) p.push(`Dernière semaine complète : ${f0(lastFull.km)} km, soit ${peak.km?f0(lastFull.km/peak.km*100)+' % du pic':''}.`);
+  if(cur&&cur.n) p.push(`~Semaine en cours : ${f1(cur.km)} km sur ${cur.n} sortie${cur.n>1?'s':''}.`);
+  const raceW=full.filter(w=>w.race).length;
+  if(raceW) p.push(`~${raceW} semaine${raceW>1?'s':''} comporte${raceW>1?'nt':''} une course.`);
+  prose('#vol-text',p);
+  $('#c-vol').setAttribute('aria-label',`Kilomètres par semaine. Pic ${f0(peak.km)} km.`);
+  mount('#c-vol',300,(svg,w,h)=>{
+    if(!W.length){svg.append(el('text',{x:0,y:20},'Aucune donnée sur la période'));return}
+    const m={l:36,r:8,t:10,b:44},iw=w-m.l-m.r,ih=h-m.t-m.b;
+    const ymax=Math.max(10,...W.map(x=>x.km),...W.map(ma))*1.08;
+    const y=lin(0,ymax,m.t+ih,m.t),bw=iw/W.length,bar=Math.max(2,bw*.7);
+    ticks(0,ymax,5).forEach(v=>{svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},f0(v)))});
+    const step=Math.ceil(W.length/Math.max(2,Math.floor(iw/72)));
+    W.forEach((x,i)=>{
+      const cx=m.l+bw*i+bw/2,partial=x.k===weekStart(today);
+      const g=el('rect',{class:'bar',x:cx-bar/2,y:y(x.km),width:bar,height:Math.max(0,y(0)-y(x.km)),rx:Math.min(5,bar/2),fill:x.race?C.run:C.cool,opacity:partial?.45:1,'data-tip':`<b>Semaine du ${fmtD(x.k)}</b><br>${f1(x.km)} km · ${x.n} sortie${x.n>1?'s':''}${x.sec?'<br>'+hm(x.sec):''}${x.race?'<br>Course':''}${partial?'<br>(en cours)':''}`});
+      g.style.animationDelay=Math.min(i*12,500)+'ms';svg.append(g);
+      if(i%step===0)svg.append(rotate(fmtD(x.k),cx+4,h-m.b+18));
+    });
+    const pts=W.map((x,i)=>`${m.l+bw*i+bw/2},${y(ma(x))}`).join(' ');
+    svg.append(el('polyline',{points:pts,fill:'none',stroke:C.run,'stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':'round'}));
+  });
+}
+
+/* ---------- pace ---------- */
+const easyRun=r=>r.hr&&r.hr<150&&!isRace(r)&&r.km>=4;
+function renderPace(){
+  const R=sel();
+  const E=runsAll.filter(easyRun);
+  const rolling=E.map((r,i)=>{const sl=E.slice(Math.max(0,i-5),i+1);return{date:r.date,v:median(sl.map(pace)),hr:median(sl.map(x=>x.hr))}}).filter(p=>inRange(p.date));
+  const eR=E.filter(r=>inRange(r.date)),eP=rangeDays?E.filter(r=>t(r.date)<t(today)-rangeDays*DAY&&t(r.date)>=t(today)-2*rangeDays*DAY):[];
+  const p=[];
+  if(eR.length){
+    p.push(`Tes footings (FC moyenne sous 150 bpm, 4 km et plus) tournent à <b>${mmss(median(eR.map(pace)))}/km</b> pour ${f0(median(eR.map(r=>r.hr)))} bpm.`);
+    if(eP.length>=4){
+      const d=median(eR.map(pace))-median(eP.map(pace)),dh=median(eR.map(r=>r.hr))-median(eP.map(r=>r.hr));
+      p.push(`Par rapport à la période précédente : ${Math.abs(d)<2?'même allure':d<0?`${Math.round(-d)} s/km plus vite`:`${Math.round(d)} s/km plus lent`}, FC ${Math.abs(dh)<1?'identique':dh>0?`+${f0(dh)} bpm`:`${f0(dh)} bpm`}.`);
+    }
+  }
+  const fast=R.filter(r=>r.km>=4.9).sort((a,b)=>pace(a)-pace(b))[0];
+  if(fast)p.push(`~Sortie la plus rapide (≥ 5 km) : ${fmtD(fast.date)}, ${f1(fast.km)} km à ${mmss(pace(fast))}/km.`);
+  prose('#pace-text',p);
+  mount('#c-pace',320,(svg,w,h)=>{
+    if(!R.length){svg.append(el('text',{x:0,y:20},'Aucune donnée sur la période'));return}
+    const m={l:44,r:10,t:10,b:30},iw=w-m.l-m.r,ih=h-m.t-m.b;
+    const t0=t(R[0].date),t1=t(today);
+    const ps=R.map(pace);let lo=Math.min(...ps),hi=Math.max(...ps);
+    lo=Math.floor((lo-10)/15)*15;hi=Math.ceil((hi+10)/15)*15;
+    const x=lin(t0,t1,m.l,m.l+iw),y=lin(lo,hi,m.t,m.t+ih);
+    ticks(lo,hi,5).forEach(v=>{svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},mmss(v)))});
+    const months=Math.max(1,Math.floor(iw/90));const span=(t1-t0)/DAY;const stepDays=Math.max(14,Math.ceil(span/months/7)*7);
+    for(let ms=t0;ms<=t1;ms+=stepDays*DAY){svg.append(el('text',{x:x(ms),y:h-8,'text-anchor':'middle'},fmtD(iso(ms))))}
+    if(rolling.length>1)svg.append(el('polyline',{points:rolling.map(p=>`${x(t(p.date))},${y(p.v)}`).join(' '),fill:'none',stroke:C.cool,'stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round',opacity:.95}));
+    R.slice().sort((a,b)=>a.km-b.km).forEach(r=>{
+      const rad=3+Math.sqrt(r.km)*1.35;
+      svg.append(el('circle',{cx:x(t(r.date)),cy:y(pace(r)),r:rad,fill:isRace(r)?C.run:C.ink2,'fill-opacity':isRace(r)?.85:.35,stroke:isRace(r)?C.run:C.ink2,'stroke-opacity':.7,'data-tip':`<b>${r.name||'Course à pied'}</b><br>${fmtDY(r.date)}<br>${f1(r.km)} km · ${mmss(pace(r))}/km${r.hr?` · ${f0(r.hr)} bpm`:''}${isRace(r)?'<br>Course':''}`}));
+    });
+  });
+}
+
+/* ---------- intensity ---------- */
+const bandOf=hr=>hr<140?0:hr<150?1:hr<160?2:3;
+const bandCol=[C.coolSoft,C.cool,C.ochre,C.run];
+function renderInt(){
+  const R=sel().filter(r=>r.hr);
+  const tot=sum(R.map(r=>r.km)),b=[0,0,0,0];R.forEach(r=>b[bandOf(r.hr)]+=r.km);
+  const p=[];
+  if(tot){
+    p.push(`<b>${f0((b[0]+b[1])/tot*100)} %</b> des kilomètres sont courus sous 150 bpm de moyenne, et <b>${f0(b[3]/tot*100)} %</b> à 160 bpm ou plus.`);
+    p.push('~Une sortie compte entière dans la tranche de sa FC moyenne : une séance de fractionné avec échauffement tombe donc rarement dans la dernière tranche.');
+  }
+  prose('#int-text',p);
+  mount('#c-int',260,(svg,w,h)=>{
+    const m=new Map();R.forEach(r=>{const k=r.date.slice(0,7);if(!m.has(k))m.set(k,[0,0,0,0]);m.get(k)[bandOf(r.hr)]+=r.km});
+    const keys=[...m.keys()].sort();
+    if(!keys.length){svg.append(el('text',{x:0,y:20},'Aucune donnée sur la période'));return}
+    const mg={l:36,r:8,t:10,b:30},iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
+    const ymax=Math.max(...keys.map(k=>sum(m.get(k))))*1.08;
+    const y=lin(0,ymax,mg.t+ih,mg.t),bw=iw/keys.length,bar=Math.min(64,bw*.66);
+    ticks(0,ymax,4).forEach(v=>{svg.append(el('line',{class:'grid',x1:mg.l,x2:w-mg.r,y1:y(v),y2:y(v)}),el('text',{x:mg.l-8,y:y(v)+4,'text-anchor':'end'},f0(v)))});
+    keys.forEach((k,i)=>{
+      const v=m.get(k),cx=mg.l+bw*i+bw/2;let acc=0;
+      v.forEach((km,j)=>{if(!km)return;const y0=y(acc),y1=y(acc+km);acc+=km;
+        const rc=el('rect',{class:'bar',x:cx-bar/2,y:y1,width:bar,height:Math.max(0,y0-y1-1),fill:bandCol[j],'data-tip':`<b>${fmtD(k+'-01',{month:'long',year:'numeric'})}</b><br>${['< 140','140–149','150–159','≥ 160'][j]} bpm : ${f0(km)} km<br>Total ${f0(sum(v))} km`});
+        rc.style.animationDelay=i*30+'ms';svg.append(rc)});
+      svg.append(el('text',{x:cx,y:h-8,'text-anchor':'middle'},fmtD(k+'-01',{month:'short'}).replace('.','')));
+    });
+  });
+}
+
+/* ---------- load ---------- */
+const STATUS={PRODUCTIVE:'productif',MAINTAINING:'maintien',PEAKING:'affûtage',RECOVERY:'récupération',UNPRODUCTIVE:'improductif',DETRAINING:'désentraînement',OVERREACHING:'surcharge',NO_STATUS:'sans statut'};
+const stLabel=s=>{const k=Object.keys(STATUS).find(k=>(s||'').startsWith(k));return k?STATUS[k]:(s||'inconnu').toLowerCase()};
+const FEED={ANAEROBIC_SHORTAGE:'pas assez de travail intense court (VMA, côtes, sprints)',AEROBIC_LOW_SHORTAGE:'pas assez d\'endurance facile',AEROBIC_HIGH_SHORTAGE:'pas assez d\'allure soutenue',BALANCED:'bien équilibré',AEROBIC_LOW_SURPLUS:'beaucoup d\'endurance facile',AEROBIC_HIGH_SURPLUS:'beaucoup d\'allure soutenue',ANAEROBIC_SURPLUS:'beaucoup de travail intense'};
+function renderLoad(){
+  const L=(D.load||[]).filter(r=>r.ctl!=null&&inRange(r.date,Math.min(rangeDays||150,150)));
+  const st=D.status||{},lastL=(D.load||[]).slice(-1)[0];
+  const p=[];
+  if(lastL){
+    p.push(`Statut Garmin : <b>${stLabel(lastL.training_status||st.training_status_feedback)}</b>. Ratio de charge aiguë sur chronique : <b>${lastL.acwr??st.load_ratio}</b> (${(lastL.acwr_status||st.acwr_status||'').toLowerCase()==='optimal'?'zone optimale':(lastL.acwr_status||st.acwr_status||'').toLowerCase()}).`);
+    const tsb=lastL.tsb;
+    p.push(`Forme (chronique − aiguë) : <b>${tsb>0?'+':''}${f0(tsb)}</b>. ${tsb<-30?'Fatigue marquée.':tsb<-10?'Fatigue modérée, normale en phase de charge.':tsb<10?'Zone neutre.':'Tu es frais.'}`);
+  }
+  if(D.balance?.feedback)p.push(`~Équilibre : ${FEED[D.balance.feedback]||D.balance.feedback.toLowerCase().replace(/_/g,' ')}.`);
+  prose('#load-text',p);
+  mount('#c-load',300,(svg,w,h)=>{
+    if(L.length<2){svg.append(el('text',{x:0,y:20},'Pas de données de charge sur la période'));return}
+    const m={l:44,r:10,t:10,b:30},iw=w-m.l-m.r,ih=h-m.t-m.b;
+    const t0=t(L[0].date),t1=t(L[L.length-1].date);
+    const vals=L.flatMap(r=>[r.ctl,r.atl,r.optimal_chronic_load_min,r.optimal_chronic_load_max].filter(v=>v!=null));
+    const ymax=Math.max(...vals)*1.05,ymin=Math.max(0,Math.min(...vals)*.9);
+    const x=lin(t0,t1,m.l,m.l+iw),y=lin(ymin,ymax,m.t+ih,m.t);
+    ticks(ymin,ymax,5).forEach(v=>{svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},f0(v)))});
+    const band=L.filter(r=>r.optimal_chronic_load_min!=null);
+    if(band.length>1)svg.append(el('polygon',{points:[...band.map(r=>`${x(t(r.date))},${y(r.optimal_chronic_load_max)}`),...band.slice().reverse().map(r=>`${x(t(r.date))},${y(r.optimal_chronic_load_min)}`)].join(' '),fill:C.coolSoft,'fill-opacity':.35}));
+    const line=(k,col,wd)=>svg.append(el('polyline',{points:L.map(r=>`${x(t(r.date))},${y(r[k])}`).join(' '),fill:'none',stroke:col,'stroke-width':wd,'stroke-linejoin':'round','stroke-linecap':'round'}));
+    line('atl',C.run,1.8);line('ctl',C.cool,3);
+    const step=Math.max(14,Math.ceil((t1-t0)/DAY/Math.max(2,Math.floor(iw/90))/7)*7);
+    for(let ms=t0;ms<=t1;ms+=step*DAY)svg.append(el('text',{x:x(ms),y:h-8,'text-anchor':'middle'},fmtD(iso(ms))));
+    const hit=el('rect',{x:m.l,y:m.t,width:iw,height:ih,fill:'transparent'});
+    const dot=el('circle',{r:4,fill:C.cool,stroke:C.card,'stroke-width':2,style:'display:none'});svg.append(hit,dot);
+    hit.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();const mx=e.clientX-r.left;const ms=t0+(mx-m.l)/iw*(t1-t0);let b=L[0];L.forEach(q=>{if(Math.abs(t(q.date)-ms)<Math.abs(t(b.date)-ms))b=q});dot.style.display='';dot.setAttribute('cx',x(t(b.date)));dot.setAttribute('cy',y(b.ctl));tip(`<b>${fmtDY(b.date)}</b><br>Chronique ${f0(b.ctl)} · Aiguë ${f0(b.atl)}<br>Forme ${b.tsb>0?'+':''}${f0(b.tsb)}`,e.clientX,e.clientY)});
+    hit.addEventListener('pointerleave',()=>{dot.style.display='none';tipEl.classList.remove('on')});
+  });
+  const b=D.balance||{};
+  const items=[['aerobic_low','Endurance facile'],['aerobic_high','Allure soutenue'],['anaerobic','Intense court']].filter(([k])=>b[k]);
+  const SL={within:'dans la cible',below:'sous la cible',above:'au-dessus de la cible'};
+  $('#balance').innerHTML='';
+  items.forEach(([k,name],i)=>{
+    const v=b[k],host=document.createElement('div');host.className='bullet';
+    host.innerHTML=`<div class="l"><span>${name}</span><span class="num">${f0(v.load)} · ${SL[v.status]||v.status} (${f0(v.target_min)}–${f0(v.target_max)})</span></div><div id="bl${i}"></div>`;
+    $('#balance').append(host);
+    mount('#bl'+i,22,(svg,w)=>{
+      const max=Math.max(v.target_max*1.25,v.load*1.08),x=lin(0,max,0,w);
+      svg.append(el('rect',{x:0,y:8,width:w,height:6,fill:C.rule,opacity:.5,rx:4}),
+        el('rect',{x:x(v.target_min),y:3,width:x(v.target_max)-x(v.target_min),height:16,fill:C.coolSoft,opacity:.5,rx:5}),
+        el('rect',{x:0,y:7,width:Math.max(3,x(v.load)),height:8,fill:v.status==='within'?C.green:C.run,rx:4}));
+    });
+  });
+}
+
+/* ---------- recovery ---------- */
+const HST={BALANCED:'équilibrée',UNBALANCED:'déséquilibrée',LOW:'basse',POOR:'mauvaise'};
+function renderRec(){
+  const H=(D.hrv||[]).filter(r=>r.last_night_avg_hrv_ms!=null&&inRange(r.date,Math.min(rangeDays||150,150)));
+  const S=D.sleep||[];
+  const p=[];
+  if(H.length){
+    const l=H[H.length-1];
+    p.push(`VFC de la dernière nuit : <b>${l.last_night_avg_hrv_ms} ms</b>, moyenne sur 7 jours <b>${l.weekly_avg_hrv_ms} ms</b>, plage ${HST[l.status]||(l.status||'').toLowerCase()}.`);
+  }
+  if(S.length){
+    const a7=avg(S.slice(-7).map(s=>s.sleep_hours)),a30=avg(S.map(s=>s.sleep_hours)),sc=avg(S.slice(-7).filter(s=>s.sleep_score).map(s=>s.sleep_score));
+    p.push(`Sommeil : <b>${f1(a7)} h</b> en moyenne sur 7 nuits (${f1(a30)} h sur 30), score moyen ${f0(sc)}.`);
+    p.push(`~${S.filter(s=>s.sleep_hours<7).length} nuit${S.filter(s=>s.sleep_hours<7).length>1?'s':''} sous 7 h sur les ${S.length} dernières.`);
+  }
+  prose('#rec-text',p);
+  mount('#c-hrv',220,(svg,w,h)=>{
+    if(H.length<2){svg.append(el('text',{x:0,y:20},'Pas de données de VFC'));return}
+    const m={l:36,r:8,t:10,b:30},iw=w-m.l-m.r,ih=h-m.t-m.b,t0=t(H[0].date),t1=t(H[H.length-1].date);
+    const vs=H.flatMap(r=>[r.last_night_avg_hrv_ms,r.weekly_avg_hrv_ms]);
+    const lo=Math.floor(Math.min(...vs)/5)*5-5,hi=Math.ceil(Math.max(...vs)/5)*5+5;
+    const x=lin(t0,t1,m.l,m.l+iw),y=lin(lo,hi,m.t+ih,m.t);
+    ticks(lo,hi,4).forEach(v=>{svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},f0(v)))});
+    const step=Math.max(7,Math.ceil((t1-t0)/DAY/Math.max(2,Math.floor(iw/90))/7)*7);
+    for(let ms=t0;ms<=t1;ms+=step*DAY)svg.append(el('text',{x:x(ms),y:h-8,'text-anchor':'middle'},fmtD(iso(ms))));
+    svg.append(el('polyline',{points:H.filter(r=>r.weekly_avg_hrv_ms!=null).map(r=>`${x(t(r.date))},${y(r.weekly_avg_hrv_ms)}`).join(' '),fill:'none',stroke:C.cool,'stroke-width':3,'stroke-linejoin':'round'}));
+    H.forEach(r=>svg.append(el('circle',{cx:x(t(r.date)),cy:y(r.last_night_avg_hrv_ms),r:3.4,fill:C.coolSoft,stroke:C.cool,'stroke-width':1,'data-tip':`<b>${fmtDY(r.date)}</b><br>VFC ${r.last_night_avg_hrv_ms} ms<br>Moyenne 7 j : ${r.weekly_avg_hrv_ms} ms`})));
+  });
+  mount('#c-sleep',180,(svg,w,h)=>{
+    if(!S.length){svg.append(el('text',{x:0,y:20},'Pas de données de sommeil'));return}
+    const m={l:36,r:8,t:10,b:30},iw=w-m.l-m.r,ih=h-m.t-m.b,ymax=Math.max(10,...S.map(s=>s.sleep_hours))+.5;
+    const y=lin(0,ymax,m.t+ih,m.t),bw=iw/S.length,bar=Math.max(3,bw*.68);
+    ticks(0,ymax,4).forEach(v=>{svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},f0(v)+' h'))});
+    S.forEach((s,i)=>{const cx=m.l+bw*i+bw/2;
+      const r=el('rect',{class:'bar',x:cx-bar/2,y:y(s.sleep_hours),width:bar,height:y(0)-y(s.sleep_hours),rx:Math.min(4,bar/2),fill:s.sleep_hours<7?C.ochre:C.cool,'data-tip':`<b>${fmtD(s.date,{weekday:'short',day:'numeric',month:'short'})}</b><br>${f1(s.sleep_hours)} h${s.sleep_score?` · score ${s.sleep_score}`:''}${s.deep_sleep_percent!=null?`<br>Profond ${f0(s.deep_sleep_percent)} % · REM ${f0(s.rem_sleep_percent)} %`:''}`});
+      r.style.animationDelay=i*10+'ms';svg.append(r);
+      if(i%Math.ceil(S.length/Math.max(2,Math.floor(iw/70)))===0)svg.append(el('text',{x:cx,y:h-8,'text-anchor':'middle'},fmtD(s.date)));
+    });
+    svg.append(el('line',{x1:m.l,x2:w-m.r,y1:y(7),y2:y(7),stroke:C.mute,'stroke-width':1.5,'stroke-dasharray':'4 4'}));
+  });
+}
+
+/* ---------- performance ---------- */
+const DISTS=[['5K',5,'5 km'],['10K',10,'10 km'],['half_marathon',21.0975,'Semi-marathon'],['marathon',42.195,'Marathon']];
+function renderPerf(){
+  const V=(D.vo2||[]).filter(r=>r.vo2_max!=null&&inRange(r.date,rangeDays||270));
+  const p=[];
+  if(V.length){const a=V[0],b=V[V.length-1];p.push(`VO₂ max : <b>${f1(b.vo2_max)}</b>, ${Math.abs(b.vo2_max-a.vo2_max)<.2?'stable':b.vo2_max>a.vo2_max?`en hausse de ${f1(b.vo2_max-a.vo2_max)}`:`en baisse de ${f1(a.vo2_max-b.vo2_max)}`} depuis le ${fmtD(a.date)}.`)}
+  p.push('~Les temps prédits par Garmin sont une estimation à partir de ton VO₂ max et de ta charge. Les meilleurs temps réels comptent les sorties à ±2,5 % de la distance.');
+  prose('#perf-text',p);
+  mount('#c-vo2',180,(svg,w,h)=>{
+    if(V.length<2){svg.append(el('text',{x:0,y:20},'Pas de données de VO₂ max'));return}
+    const m={l:36,r:8,t:10,b:30},iw=w-m.l-m.r,ih=h-m.t-m.b,t0=t(V[0].date),t1=t(V[V.length-1].date);
+    const vs=V.map(r=>r.vo2_max),lo=Math.floor(Math.min(...vs)-.5),hi=Math.ceil(Math.max(...vs)+.5);
+    const x=lin(t0,t1,m.l,m.l+iw),y=lin(lo,hi,m.t+ih,m.t);
+    ticks(lo,hi,4).forEach(v=>{svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},f0(v)))});
+    const step=Math.max(14,Math.ceil((t1-t0)/DAY/Math.max(2,Math.floor(iw/90))/7)*7);
+    for(let ms=t0;ms<=t1;ms+=step*DAY)svg.append(el('text',{x:x(ms),y:h-8,'text-anchor':'middle'},fmtD(iso(ms))));
+    svg.append(el('polyline',{points:V.map(r=>`${x(t(r.date))},${y(r.vo2_max)}`).join(' '),fill:'none',stroke:C.run,'stroke-width':2.5,'stroke-linejoin':'round'}));
+    V.filter((_,i)=>i%3===0).forEach(r=>svg.append(el('circle',{cx:x(t(r.date)),cy:y(r.vo2_max),r:8,fill:'transparent','data-tip':`<b>${fmtDY(r.date)}</b><br>VO₂ max ${f1(r.vo2_max)}`})));
+  });
+  const pr=D.predictions?.predictions||{};
+  const rows=DISTS.map(([k,km,name])=>{
+    const cand=runsAll.filter(r=>Math.abs(r.km-km)/km<=.025&&r.sec>0).sort((a,b)=>a.sec-b.sec)[0];
+    const best=cand?`${hms(cand.sec)}<br><small>${fmtDY(cand.date)}${Math.abs(cand.km-km)>.05?`, ${f1(cand.km)} km`:''}</small>`:'<small>–</small>';
+    return `<tr><td>${name}</td><td class="num">${pr[k]?hms(pr[k].time_seconds):'–'}</td><td class="num">${best}</td></tr>`;
+  }).join('');
+  $('#preds').innerHTML=`<thead><tr><th>Distance</th><th>Prédit par Garmin${D.predictions?.prediction_date?`<br><small>au ${fmtDY(D.predictions.prediction_date)}</small>`:''}</th><th>Meilleur temps réel</th></tr></thead><tbody>${rows}</tbody>`;
+}
+
+/* ---------- log ---------- */
+function renderLog(){
+  let R=sel().slice().reverse();
+  if(filter==='race')R=R.filter(isRace);
+  if(filter==='easy')R=R.filter(easyRun);
+  if(filter==='long')R=R.filter(r=>r.km>=15);
+  prose('#log-text',[`${R.length} sortie${R.length>1?'s':''} sur la période${filter!=='all'?', filtrée'+(R.length>1?'s':''):''}.`,'~Les courses sont repérées par un trait rouge.']);
+  const rows=R.slice(0,logLimit).map(r=>`<tr class="${isRace(r)?'race':''}"><td class="num">${fmtDY(r.date)}</td><td>${(r.name||'Course à pied').replace(/&/g,'&amp;').replace(/</g,'&lt;')}${isRace(r)?'<span class="badge">course</span>':''}</td><td class="num">${f1(r.km)}</td><td class="num">${hms(r.sec)}</td><td class="num">${mmss(pace(r))}</td><td class="num">${r.hr?f0(r.hr):'–'}</td><td class="num">${r.elev!=null?f0(r.elev):'–'}</td></tr>`).join('');
+  $('#log').innerHTML=`<thead><tr><th>Date</th><th>Sortie</th><th>km</th><th>Durée</th><th>Allure /km</th><th>FC moy.</th><th>D+ (m)</th></tr></thead><tbody>${rows||'<tr><td colspan="7" class="empty">Aucune sortie</td></tr>'}</tbody>`;
+  const more=$('#more');more.hidden=R.length<=logLimit;more.textContent=`Afficher plus (${R.length-logLimit} restantes)`;
+}
+$('#more').onclick=()=>{logLimit+=30;renderLog()};
+
+/* ---------- marathon ---------- */
+const RACE={date:'2027-04-04',target:3*3600+20*60};
+function renderMara(){
+  const tgt=RACE.target,tp=tgt/42.195,p=[];
+  const wl=Math.max(1,Math.ceil((t(RACE.date)-t(today))/(7*DAY)));
+  const M=[...runsAll].reverse().find(r=>r.km>=40);
+  const fin=(a,b,c)=>[a,b,c];
+  const riegel=r=>r.sec*Math.pow(42.195/r.km,1.06);
+  const eff=runsAll.filter(r=>isRace(r)&&r.km>=4.9&&r.km<30&&t(r.date)>=t(today)-150*DAY).sort((a,b)=>a.date<b.date?1:-1).slice(0,5);
+  const preds=eff.map(r=>({r,m:riegel(r)}));
+  const best=preds.length?Math.min(...preds.map(x=>x.m)):null;
+  const semi=preds.filter(x=>x.r.km>=19).sort((a,b)=>a.m-b.m)[0];
+  const gp=(D.predictions||{}).predictions||{};
+  const garmin=gp.marathon?gp.marathon.time_seconds:null;
+  const eq=semi?semi.m:best;
+  const facts=[
+    ['Objectif',hms(tgt),`${mmss(tp)}/km`],
+    ['Dans',`${wl} semaines`,fmtDY(RACE.date)],
+    ['Projection semi',eq?hms(eq):'–',semi?`d'apr\u00e8s ${f1(semi.r.km)} km en ${hms(semi.r.sec)}`:''],
+    ['Marge sur l\'objectif',eq?`${eq<tgt?'\u2212':'+'}${hm(Math.abs(tgt-eq)).replace(' min',' min')}`:'–',eq&&eq<tgt?'sur le papier':'\u00e0 combler']
+  ];
+  $('#mara-facts').innerHTML=facts.map(([a,b,c])=>`<div><dt>${a}</dt><dd>${b}</dd><small>${c}</small></div>`).join('');
+  let rows=preds.map(({r,m})=>`<tr><td>${fmtDY(r.date)}<br><small>${f1(r.km)} km en ${hms(r.sec)} \u00b7 ${mmss(pace(r))}/km</small></td><td class="num">${hms(m)}<br><small>${m<=tgt?'sous l\'objectif':'+'+hm(m-tgt)}</small></td></tr>`);
+  if(garmin)rows.push(`<tr><td>Pr\u00e9diction Garmin<br><small>VO\u2082 max et charge</small></td><td class="num">${hms(garmin)}</td></tr>`);
+  if(M)rows.push(`<tr><td>Marathon d'Annecy, r\u00e9el<br><small>${fmtDY(M.date)} \u00b7 ${mmss(pace(M))}/km \u00b7 ${f0(M.hr)} bpm</small></td><td class="num">${hms(M.sec)}</td></tr>`);
+  $('#mara-pred').innerHTML=`<thead><tr><th>Effort</th><th>\u00c9quivalent marathon</th></tr></thead><tbody>${rows.join('')}</tbody>`;
+
+  const wkOf=s=>weekStart(s);
+  const W=weeksAll;
+  const full=W.filter(w=>w.k!==weekStart(today));
+  const now12=full.slice(-12),now8=full.slice(-8);
+  let prep=[];
+  if(M){const mk=wkOf(M.date),i=W.findIndex(w=>w.k===mk);prep=W.slice(Math.max(0,i-16),i)}
+  const prepBuild=prep.slice(0,13);
+  const lr=(from,to)=>runsAll.filter(r=>r.km>=25&&r.date>=from&&r.date<=to);
+  const mx=a=>a.length?Math.max(...a.map(w=>w.km)):0;
+  const prepFrom=prep[0]?prep[0].k:'9999',prepTo=M?M.date:'0';
+  const nowFrom=now12[0]?now12[0].k:'9999';
+  const longP=runsAll.filter(r=>r.date>=prepFrom&&r.date<prepTo).reduce((m,r)=>Math.max(m,r.km),0);
+  const longN=runsAll.filter(r=>r.date>=nowFrom).reduce((m,r)=>Math.max(m,r.km),0);
+  const n25P=lr(prepFrom,prepTo).length,n25N=lr(nowFrom,'9999').length;
+  const PLAN=[
+    ['2026-11-30',49,0,16,3],['2026-12-07',51,0,18,3],['2026-12-14',53,0,20,4],['2026-12-21',34,1,14,0],
+    ['2026-12-28',56,0,22,5],['2027-01-04',58,0,24,6.4],['2027-01-11',60,0,26,8.6],['2027-01-18',43,1,16,0],
+    ['2027-01-25',63,0,28,8],['2027-02-01',63,0,28,8],['2027-02-08',65,0,30,12.9],['2027-02-15',49,1,18,0],
+    ['2027-02-22',67,0,32,20],['2027-03-01',70,0,32,18],['2027-03-08',55,0,26,8.6],['2027-03-15',40,1,21,0],
+    ['2027-03-22',41,1,14,6.4],['2027-03-29',63,1,42.2,42.2]
+  ].map(([k,km,est,sl,mp])=>({k,km,est,sl,mp}));
+  const pk=PLAN.reduce((m,w)=>w.km>m.km?w:m,PLAN[0]);
+  const sl25=PLAN.filter(w=>w.sl>=25&&w.sl<40),sl28=PLAN.filter(w=>w.sl>=28&&w.sl<40);
+  const mpTot=sum(PLAN.slice(0,-1).map(w=>w.mp));
+  const cmp=[
+    ['Plus grosse semaine',prep.length?`${f0(mx(prep))} km`:'\u2013',`${f0(mx(now12))} km`,`${pk.km} km`],
+    ['Moyenne hebdo (8 sem. de mont\u00e9e)',prepBuild.length?`${f0(avg(prepBuild.slice(-8).map(w=>w.km)))} km`:'\u2013',`${f0(avg(now8.map(w=>w.km)))} km`,`${f0(avg(PLAN.slice(6,14).map(w=>w.km)))} km`],
+    ['Sortie la plus longue',prep.length?`${f1(longP)} km`:'\u2013',`${f1(longN)} km`,'32 km'],
+    ['Sorties \u2265 25 km',prep.length?String(n25P):'\u2013',String(n25N),String(sl25.length)],
+    ['dont \u2265 28 km',prep.length?String(runsAll.filter(r=>r.km>=28&&r.km<40&&r.date>=prepFrom&&r.date<prepTo).length):'\u2013','0',String(sl28.length)],
+    ['Km \u00e0 allure marathon dans les longues','\u2013','\u2013',`\u2248 ${f0(mpTot)} km`]
+  ];
+  $('#mara-cmp').innerHTML=`<thead><tr><th></th><th>Pr\u00e9pa d'Annecy</th><th>12 derni\u00e8res sem.</th><th>Ton plan</th></tr></thead><tbody>${cmp.map(r=>`<tr><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num">${r[2]}</td><td class="num">${r[3]}</td></tr>`).join('')}</tbody>`;
+
+  const items=[],bridgeN=Math.round((t(PLAN[0].k)-t(weekStart(today)))/(7*DAY));
+  const bridge=[35,37,40,32,42,44,46,48].slice(0,bridgeN);
+  W.slice(-12).forEach(w=>items.push({v:w.km,label:fmtD(w.k),col:C.cool,tip:`<b>Semaine du ${fmtD(w.k)}</b><br>${f0(w.km)} km`}));
+  bridge.forEach((v,i)=>{const k=iso(t(weekStart(today))+(i+(W[W.length-1].k===weekStart(today)?1:0))*7*DAY);items.push({v,label:fmtD(k),col:C.mute,tip:`<b>Semaine du ${fmtD(k)}</b><br>\u2248 ${v} km, pont sugg\u00e9r\u00e9`})});
+  const wkAct=k=>{const x=W.find(q=>q.k===k);return x?x.km:0},wkLong=k=>runsAll.filter(r=>weekStart(r.date)===k).reduce((m,r)=>Math.max(m,r.km),0),started=k=>t(k)<=t(today),curK=weekStart(today);
+  PLAN.forEach((w,i)=>{const last=i===PLAN.length-1,st=started(w.k),ac=st?wkAct(w.k):null,live=w.k===curK;items.push({v:w.km,v2:ac,label:fmtD(w.k),col:last?C.run:C.coolSoft,tip:`<b>Semaine ${i+1} \u00b7 ${fmtD(w.k)}</b><br>Pr\u00e9vu : ${w.est?'\u2248 ':''}${w.km} km${st?`<br>R\u00e9alis\u00e9 : ${f0(ac)} km${live?' (en cours)':''}`:''}${w.sl&&!last?`<br>Sortie longue ${w.sl} km${w.mp?`, dont \u2248 ${f0(w.mp)} km \u00e0 allure marathon`:''}`:''}${last?'<br>Marathon de Paris':''}`})});
+  const trk=PLAN.map((w,i)=>({w,i})).filter(o=>started(o.w.k));
+  $('#mara-track').innerHTML=trk.length?`<thead><tr><th>Semaine</th><th>Pr\u00e9vu</th><th>R\u00e9alis\u00e9</th><th>\u00c9cart</th><th>Sortie longue</th></tr></thead><tbody>${trk.map(({w,i})=>{const ac=wkAct(w.k),live=w.k===curK,d=ac-w.km,L=wkLong(w.k);return `<tr><td>S${i+1} \u00b7 ${fmtD(w.k)}${live?' (en cours)':''}</td><td class="num">${w.est?'\u2248 ':''}${w.km} km</td><td class="num">${f0(ac)} km</td><td class="num">${live?'\u2013':(d>=0?'+':'\u2212')+f0(Math.abs(d))+' km'}</td><td class="num">${w.sl&&w.sl<40?`${f1(L)} / ${w.sl} km`:'\u2013'}</td></tr>`}).join('')}</tbody>`:`<tbody><tr><td>Le suivi commence avec la semaine 1 du plan (${fmtDY(PLAN[0].k)}).</td></tr></tbody>`;
+  bars('#c-mara',items,{h:280});
+
+  const gapV=eq?tgt-eq:null,cur4=avg(full.slice(-4).map(w=>w.km));
+  const shares=PLAN.filter(w=>w.sl>=28&&w.sl<40).map(w=>w.sl/w.km);
+  p.push(`Ton objectif de <b>${hms(tgt)}</b> demande <b>${mmss(tp)}/km</b> sur 42,2 km, soit environ ${f0(pace(M||{sec:tp,km:1})-tp)} s/km plus vite qu'\u00e0 Annecy.`);
+  if(semi)p.push(`Ton dernier semi (${f1(semi.r.km)} km en ${hms(semi.r.sec)}, ${fmtD(semi.r.date)}) projette un marathon \u00e0 <b>${hms(semi.m)}</b> : la vitesse est l\u00e0, ${gapV>0?`avec ${hm(gapV)} de marge`:'mais il reste du chrono \u00e0 aller chercher'}. Le facteur limitant est l'endurance, et c'est ce que ton plan travaille.`);
+  p.push(`<b>Ton plan est solide.</b> Il monte de 49 \u00e0 ${pk.km} km, avec une d\u00e9charge toutes les 4 semaines, ${sl25.length} sorties de 25 km et plus (${sl28.length} de 28 km et plus, record \u00e0 32 km) et environ ${f0(mpTot)} km \u00e0 allure marathon. Annecy : pic \u00e0 ${f0(mx(prep))} km et sortie max \u00e0 ${f0(longP)} km.`);
+  p.push(`<b>Le pont avant le 30 novembre est le vrai risque.</b> Tu es \u00e0 ${f0(cur4)} km par semaine, le plan d\u00e9marre \u00e0 49 : ${f0((49/cur4-1)*100)} % de plus d'un coup. Il reste ${bridgeN} semaines : monte d'environ 10 % par semaine vers 45\u201348 km (barres grises), avec une d\u00e9charge.`);
+  p.push(`<b>Longue sortie trop dominante.</b> Avec 4 sorties par semaine, la sortie longue pèse ${f0(Math.min(...shares)*100)} \u00e0 ${f0(Math.max(...shares)*100)} % du volume en semaines 9 \u00e0 14. Un 5e footing de 6 \u00e0 8 km (lundi ou jeudi) r\u00e9partirait la charge et ferait du volume sans alourdir les s\u00e9ances cl\u00e9s.`);
+  p.push(`<b>Semaines \u00e0 surveiller :</b> les semaines 7 et 11 cumulent 12 km de r\u00e9p\u00e9titions \u00e0 4:25 (allure semi) et jusqu'\u00e0 60 min \u00e0 4:40 le dimanche. La semaine 15 (55 km, 4\u00d72000 \u00e0 4:20 puis 26 km avec 2\u00d720 min) tombe \u00e0 trois semaines de la course : all\u00e8ge l'une des deux s\u00e9ances.`);
+  const hrs=runsAll.filter(r=>!isRace(r)&&r.km>=8&&r.hr&&t(r.date)>=t(today)-150*DAY);
+  if(hrs.length>=8){
+    const xs=hrs.map(pace),ys=hrs.map(r=>r.hr),mx2=avg(xs),my=avg(ys);
+    const b=sum(xs.map((x,i)=>(x-mx2)*(ys[i]-my)))/(sum(xs.map(x=>(x-mx2)**2))||1);
+    const hr=my+b*(tp-mx2);
+    const hmax=Math.max(...runsAll.filter(r=>t(r.date)>=t(today)-365*DAY).map(r=>r.hrmax||0));
+    if(b<0)p.push(`<b>Allures :</b> tenir ${mmss(tp)}/km co\u00fbte environ ${f0(hr)} bpm d'apr\u00e8s tes sorties r\u00e9centes${hmax?` (${f0(hr/hmax*100)} % de ta FC max)`:''}, contre ${M?f0(M.hr):'\u2013'} bpm \u00e0 Annecy. Tes longues \u00e0 5:05\u20135:10 sont plus rapides que tes footings habituels (5:18), mais tes derniers 20 km \u00e0 4:53 pour 152 bpm montrent que c'est tenable : garde un plafond autour de 155 bpm.`);
+  }
+  p.push(`<b>Semi de Mulhouse :</b> \u00e0 deux semaines de Paris, courir \u00e0 4:30\u20134:35 (1:35\u20131:36) plut\u00f4t qu'\u00e0 fond. Tu as couru 1:40 l'an dernier et ton niveau actuel est de 1:30.`);
+  p.push(`~Plan saisi le 5 octobre. Les kilom\u00e8tres des semaines de d\u00e9charge, du semi et de la course sont estim\u00e9s (\u2248). Le pont est une suggestion.`);
+  prose('#mara-text',p);
+}
+
+/* ---------- running detail sections ---------- */
+const mpb=r=>r.hr?(r.km*1000/r.sec)*60/r.hr:null;
+const valid=a=>a.filter(v=>v!=null&&!isNaN(v));
+const xAxis=(svg,t0,t1,m,iw,h)=>{const span=(t1-t0)/DAY;const stepDays=Math.max(7,Math.ceil(span/Math.max(2,Math.floor(iw/90))/7)*7);const x=lin(t0,t1,m.l,m.l+iw);for(let ms=t0;ms<=t1;ms+=stepDays*DAY)svg.append(el('text',{x:x(ms),y:h-8,'text-anchor':'middle'},fmtD(iso(ms))));return x};
+function trend(id,pts,o={}){
+  const P=pts.filter(p=>p.v!=null&&!isNaN(p.v)&&inRange(p.date,o.days)).sort((a,b)=>a.date<b.date?-1:1);
+  const fmt=o.fmt||f1;
+  mount(id,o.h||180,(svg,w,h)=>{
+    if(P.length<3){svg.append(el('text',{x:0,y:20},'Pas assez de données sur la période'));return}
+    const m={l:44,r:10,t:10,b:30},iw=w-m.l-m.r,ih=h-m.t-m.b;
+    const vs=P.map(p=>p.v);let lo=Math.min(...vs),hi=Math.max(...vs);const pad=(hi-lo)*.12||1;lo-=pad;hi+=pad;
+    const t0=t(P[0].date),t1=Math.max(t(P[P.length-1].date),t0+DAY),y=lin(lo,hi,m.t+ih,m.t);
+    ticks(lo,hi,4).forEach(v=>{if(v>=lo&&v<=hi)svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},o.axis?o.axis(v):fmt(v)))});
+    const x=xAxis(svg,t0,t1,m,iw,h);
+    const k=o.roll||6;
+    if(o.line!==false&&P.length>=k/2){const rl=P.map((p,i)=>`${x(t(p.date))},${y(median(P.slice(Math.max(0,i-k+1),i+1).map(q=>q.v)))}`).join(' ');svg.append(el('polyline',{points:rl,fill:'none',stroke:o.color||C.cool,'stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round'}))}
+    P.forEach(p=>svg.append(el('circle',{cx:x(t(p.date)),cy:y(p.v),r:o.line===false?3.5:3,fill:o.color||C.cool,'fill-opacity':o.line===false?.9:.3,'data-tip':`<b>${fmtDY(p.date)}</b><br>${o.axis?o.axis(p.v):fmt(p.v)} ${o.unit||''}${p.note?'<br>'+p.note:''}`})));
+  });
+}
+function bars(id,items,o={}){
+  mount(id,o.h||180,(svg,w,h)=>{
+    if(!items.length){svg.append(el('text',{x:0,y:20},'Pas assez de données sur la période'));return}
+    const m={l:40,r:8,t:10,b:30},iw=w-m.l-m.r,ih=h-m.t-m.b;
+    const ymax=Math.max(o.ymin0??0,...items.map(i=>i.v),o.ref||0,...items.map(i=>i.v2||0))*1.1||1;
+    const y=lin(0,ymax,m.t+ih,m.t),bw=iw/items.length,bar=Math.max(3,Math.min(40,bw*.7));
+    ticks(0,ymax,4).forEach(v=>{if(v<=ymax)svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},f0(v)))});
+    const step=Math.ceil(items.length/Math.max(2,Math.floor(iw/62)));
+    items.forEach((it,i)=>{const cx=m.l+bw*i+bw/2;
+      svg.append(el('rect',{class:'bar',x:cx-bar/2,y:y(it.v),width:bar,height:Math.max(0,y(0)-y(it.v)),rx:Math.min(5,bar/2),fill:it.col||C.cool,'data-tip':it.tip}));
+      if(it.v2!=null)svg.append(el('circle',{cx,cy:y(it.v2),r:Math.min(5,bar/2+1),fill:C.run,stroke:C.card,'stroke-width':1.5,'data-tip':it.tip}));
+      if(i%step===0)svg.append(el('text',{x:cx,y:h-8,'text-anchor':'middle'},it.label))});
+    if(o.ref)svg.append(el('line',{x1:m.l,x2:w-m.r,y1:y(o.ref),y2:y(o.ref),stroke:C.mute,'stroke-dasharray':'4 4'}));
+  });
+}
+const rangeRuns=()=>sel();
+const easyDet=()=>runsAll.filter(r=>easyRun(r)&&r.hr);
+
+function renderZone(){
+  const R=sel().filter(r=>r.zones);
+  const tot=[0,0,0,0,0];R.forEach(r=>r.zones.forEach((s,i)=>tot[i]+=s));
+  const T=sum(tot),p=[];
+  if(T){
+    const pc=tot.map(v=>v/T*100);
+    p.push(`Sur ${R.length} sorties avec zones, <b>${f0(pc[0]+pc[1])} %</b> du temps est en Z1–Z2 (facile), <b>${f0(pc[2])} %</b> en Z3, <b>${f0(pc[3]+pc[4])} %</b> en Z4–Z5.`);
+    const hardShare=pc[3]+pc[4],mid=pc[2];
+    p.push(hardShare<12&&mid>35?'Beaucoup de temps en Z3 : la zone « grise », trop dure pour récupérer et trop douce pour progresser en vitesse. Une séance sur deux gagnerait à passer en Z2.':hardShare>25?'Plus du quart du temps est en Z4–Z5 : prévois assez de facile autour pour absorber.':'La répartition est plutôt polarisée, ce qui est l\'approche classique pour progresser en endurance.');
+    p.push(`~Zones Garmin à partir de ${(R[0].zlow||[]).slice(0,5).join(' / ')} bpm.`);
+  }else p.push('Pas de données de zones sur la période.');
+  prose('#zone-text',p);
+  const col=[C.coolSoft,C.cool,C.green,C.ochre,C.run];
+  mount('#c-zone',260,(svg,w,h)=>{
+    const m=new Map();R.forEach(r=>{const k=r.date.slice(0,7);if(!m.has(k))m.set(k,[0,0,0,0,0]);r.zones.forEach((s,i)=>m.get(k)[i]+=s/3600)});
+    const keys=[...m.keys()].sort();
+    if(!keys.length){svg.append(el('text',{x:0,y:20},'Aucune donnée'));return}
+    const mg={l:36,r:8,t:10,b:30},iw=w-mg.l-mg.r,ih=h-mg.t-mg.b;
+    const ymax=Math.max(...keys.map(k=>sum(m.get(k))))*1.08;
+    const y=lin(0,ymax,mg.t+ih,mg.t),bw=iw/keys.length,bar=Math.min(64,bw*.66);
+    ticks(0,ymax,4).forEach(v=>svg.append(el('line',{class:'grid',x1:mg.l,x2:w-mg.r,y1:y(v),y2:y(v)}),el('text',{x:mg.l-8,y:y(v)+4,'text-anchor':'end'},f0(v)+' h')));
+    keys.forEach((k,i)=>{const v=m.get(k),cx=mg.l+bw*i+bw/2;let acc=0;
+      v.forEach((hh,j)=>{const y0=y(acc),y1=y(acc+hh);acc+=hh;if(hh>0)svg.append(el('rect',{class:'bar',x:cx-bar/2,y:y1,width:bar,height:Math.max(0,y0-y1-1),fill:col[j],'data-tip':`<b>${fmtD(k+'-01',{month:'long',year:'numeric'})}</b><br>Z${j+1} : ${f1(hh)} h (${f0(hh/sum(v)*100)} %)`}))});
+      if(i%Math.ceil(keys.length/Math.max(2,Math.floor(iw/60)))===0)svg.append(el('text',{x:cx,y:h-8,'text-anchor':'middle'},fmtD(k+'-01',{month:'short'})))});
+  });
+}
+
+const TL={AEROBIC_BASE:'endurance de base',TEMPO:'tempo',LACTATE_THRESHOLD:'seuil',VO2MAX:'VO₂ max',ANAEROBIC_CAPACITY:'capacité anaérobie',RECOVERY:'récupération',SPRINT:'sprint',NO_BENEFIT:'sans effet'};
+function renderTE(){
+  const R=runsAll.filter(r=>r.te!=null).slice(-40);
+  const A=sel().filter(r=>r.te!=null);const p=[];
+  if(A.length){
+    const cnt={};A.forEach(r=>{const k=r.tlabel||'?';cnt[k]=(cnt[k]||0)+1});
+    const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${TL[k]||k.toLowerCase()} (${v})`).join(', ');
+    p.push(`Effet aérobie moyen <b>${f1(avg(A.map(r=>r.te)))}</b> sur ${A.length} sorties. Les plus fréquentes : ${top}.`);
+    const hi=A.filter(r=>r.te>=4).length,an=A.filter(r=>(r.ate||0)>=1.5).length;
+    p.push(`${hi} sortie${hi>1?'s':''} à effet ≥ 4,0 (forte stimulation) et ${an} avec un vrai travail anaérobie (≥ 1,5).`);
+    if(an<=A.length*.05)p.push('~Très peu d\'anaérobie : c\'est ce que Garmin souligne dans l\'équilibre de charge. Quelques lignes droites ou côtes courtes suffiraient.');
+    const tl=A.filter(r=>r.tl);const l7=tl.filter(r=>t(r.date)>t(today)-7*DAY);
+    if(tl.length)p.push(`~Charge d\'entraînement moyenne par sortie : ${f0(avg(tl.map(r=>r.tl)))}, dont ${f0(sum(l7.map(r=>r.tl)))} sur les 7 derniers jours.`);
+  }else p.push('Pas de données de training effect.');
+  prose('#te-text',p);
+  bars('#c-te',R.map(r=>({v:r.te,v2:r.ate,label:fmtD(r.date),col:r.te>=4?C.ochre:C.cool,tip:`<b>${fmtDY(r.date)}</b><br>${f1(r.km)} km · ${mmss(pace(r))}/km<br>Aérobie ${f1(r.te)} · anaérobie ${f1(r.ate)}<br>${TL[r.tlabel]||r.tlabel||''}${r.tl?` · charge ${r.tl}`:''}`})),{h:240});
+}
+
+function renderForm(){
+  const R=sel(),E=R.filter(r=>easyRun(r)&&r.cad),pr=[];
+  const mk=(k,f)=>runsAll.filter(r=>r[k]!=null&&r[k]>0).map(r=>({date:r.date,v:r[k],note:`${f1(r.km)} km · ${mmss(pace(r))}/km`}));
+  const opts=(u,fmt)=>({unit:u,fmt,days:rangeDays||0});
+  trend('#c-cad',mk('cad'),{...opts('ppm',f0)});
+  trend('#c-gct',mk('gct'),{...opts('ms',f0),color:C.ochre});
+  trend('#c-vo',mk('vo'),{...opts('cm',f1),color:C.green});
+  trend('#c-pow',mk('pow'),{...opts('W',f0),color:C.run});
+  const pts=E.filter(r=>r.cad);
+  if(pts.length>=4){
+    const c=median(pts.map(r=>r.cad)),g=median(valid(pts.map(r=>r.gct))),v=median(valid(pts.map(r=>r.vo))),s=median(valid(pts.map(r=>r.stride)));
+    pr.push(`En footing : cadence <b>${f0(c)} ppm</b>${s?`, foulée ${f0(s)} cm`:''}${g?`, contact au sol ${f0(g)} ms`:''}${v?`, oscillation ${f1(v)} cm`:''}.`);
+    if(c<172)pr.push(`Une cadence sous 170–175 ppm allonge souvent la foulée et le temps au sol. Monter de 3 à 5 % sur les footings est un levier simple.`);
+    const slow=pts.filter(r=>pace(r)>=median(pts.map(pace))),fast=pts.filter(r=>pace(r)<median(pts.map(pace)));
+    if(slow.length>2&&fast.length>2)pr.push(`~À allure plus vive la cadence passe de ${f0(median(slow.map(r=>r.cad)))} à ${f0(median(fast.map(r=>r.cad)))} ppm : ta vitesse vient surtout de la longueur de foulée.`);
+    const pw=pts.filter(r=>r.pow);if(pw.length>3)pr.push(`~Puissance moyenne en footing : ${f0(median(pw.map(r=>r.pow)))} W.`);
+  }else pr.push('Pas assez de sorties avec la dynamique de course sur cette période.');
+  prose('#form-text',pr);
+}
+
+function decoupling(r){
+  const L=(r.laps||[]).filter(l=>l[0]>=800&&l[2]&&l[1]);
+  if(r.km<7||L.length<6)return null;
+  const sp=L.map(l=>l[0]/l[1]),mu=avg(sp),sd=Math.sqrt(avg(sp.map(v=>(v-mu)**2)));
+  if(sd/mu>.07)return null;
+  const half=sum(L.map(l=>l[0]))/2;let acc=0;const a=[],b=[];
+  L.forEach(l=>{(acc<half?a:b).push(l);acc+=l[0]});
+  if(!a.length||!b.length)return null;
+  const ef=g=>(sum(g.map(l=>l[0]))/sum(g.map(l=>l[1])))/avg(g.map(l=>l[2]));
+  return (ef(a)-ef(b))/ef(a)*100;
+}
+function renderEff(){
+  const pts=easyDet().map(r=>({date:r.date,v:mpb(r),note:`${mmss(pace(r))}/km · ${f0(r.hr)} bpm`}));
+  trend('#c-eff',pts,{unit:'m/battement',fmt:v=>v.toFixed(2).replace('.',','),days:rangeDays||0});
+  const p=[];
+  const E=pts.filter(q=>inRange(q.date));
+  if(E.length>=6){
+    const h=Math.floor(E.length/2),a=median(E.slice(0,h).map(q=>q.v)),b=median(E.slice(h).map(q=>q.v));
+    p.push(`Chaque battement te fait avancer de <b>${b.toFixed(2).replace('.',',')} m</b> en footing, contre ${a.toFixed(2).replace('.',',')} m au début de la période (${(b-a)/a*100>=0?'+':''}${f1((b-a)/a*100)} %).`);
+  }
+  const D2=runsAll.map(r=>({r,d:decoupling(r)})).filter(x=>x.d!=null&&inRange(x.r.date));
+  bars('#c-dec',D2.map(({r,d})=>({v:Math.max(0,d),label:fmtD(r.date),col:d>5?C.ochre:C.cool,tip:`<b>${fmtDY(r.date)}</b><br>${f1(r.km)} km · ${mmss(pace(r))}/km<br>Dérive ${f1(d)} %`})),{h:170,ref:5});
+  if(D2.length>=3){const m=median(D2.map(x=>x.d));p.push(`Dérive cardiaque médiane <b>${f1(m)} %</b> sur ${D2.length} sorties régulières : ${m<5?'ton endurance de base est solide, le cœur ne dérive pas.':'le cœur dérive nettement en 2e moitié, signe d\'une base à consolider (ou d\'une allure trop vive au départ).'}`)}
+  const L=[...runsAll].reverse().find(r=>r.laps&&r.km>=8);
+  if(L){
+    $('#laps-title').textContent=`${L.name||'Sortie'} · ${fmtD(L.date)} · ${f1(L.km)} km`;
+    const laps=L.laps.filter(l=>l[0]>=300&&l[1]);
+    mount('#c-laps',200,(svg,w,h)=>{
+      const m={l:44,r:36,t:10,b:28},iw=w-m.l-m.r,ih=h-m.t-m.b;
+      const ps=laps.map(l=>l[1]/l[0]*1000),lo=Math.floor((Math.min(...ps)-15)/15)*15,hi=Math.ceil((Math.max(...ps)+5)/15)*15;
+      const y=lin(hi,lo,m.t+ih,m.t);
+      ticks(lo,hi,4).forEach(v=>svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},mmss(v))));
+      const bw=iw/laps.length,bar=Math.min(34,bw*.7);
+      const hs=valid(laps.map(l=>l[2])),hl=Math.min(...hs)-5,hh=Math.max(...hs)+5,yh=lin(hl,hh,m.t+ih,m.t);
+      laps.forEach((l,i)=>{const cx=m.l+bw*i+bw/2,pc=l[1]/l[0]*1000;
+        svg.append(el('rect',{class:'bar',x:cx-bar/2,y:y(pc),width:bar,height:Math.max(0,m.t+ih-y(pc)),rx:Math.min(5,bar/2),fill:C.cool,opacity:.85,'data-tip':`<b>km ${i+1}</b><br>${mmss(pc)}/km${l[2]?` · ${f0(l[2])} bpm`:''}${l[3]?`<br>cadence ${f0(l[3])}`:''}${l[4]?` · ${f0(l[4])} W`:''}`}));
+        if(i%Math.ceil(laps.length/Math.max(2,Math.floor(iw/34)))===0)svg.append(el('text',{x:cx,y:h-8,'text-anchor':'middle'},String(i+1)))});
+      svg.append(el('polyline',{points:laps.map((l,i)=>l[2]?`${m.l+bw*i+bw/2},${yh(l[2])}`:'').filter(Boolean).join(' '),fill:'none',stroke:C.run,'stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':'round'}));
+    });
+    const ps=laps.map(l=>l[1]/l[0]*1000),k=Math.floor(ps.length/2),f=avg(ps.slice(0,k)),s=avg(ps.slice(k));
+    p.push(`~Sur ${L.name||'ta dernière sortie longue'} : ${s<f-3?'negative split, ':s>f+3?'ralentissement, ':'allure constante, '}${mmss(f)} puis ${mmss(s)}/km.`);
+  }else $('#c-laps').innerHTML='<p class="empty">Pas de sortie de 8 km avec détails.</p>';
+  prose('#eff-text',p.length?p:['Pas assez de données détaillées.']);
+}
+
+function renderMeteo(){
+  const E=easyDet().filter(r=>r.temp!=null&&inRange(r.date,rangeDays||0));
+  const p=[];
+  if(E.length>=8){
+    const xs=E.map(r=>r.temp),ys=E.map(r=>pace(r)),mx=avg(xs),my=avg(ys);
+    const b=sum(xs.map((x,i)=>(x-mx)*(ys[i]-my)))/(sum(xs.map(x=>(x-mx)**2))||1);
+    const ex=E.map(mpb),b2=sum(xs.map((x,i)=>(x-mx)*(ex[i]-avg(ex))))/(sum(xs.map(x=>(x-mx)**2))||1);
+    p.push(`Sur ${E.length} footings avec météo, la température moyenne est de ${f0(mx)} °C (de ${f0(Math.min(...xs))} à ${f0(Math.max(...xs))} °C).`);
+    p.push(`Par tranche de 10 °C en plus, ton efficacité varie de <b>${f1(b2*10/avg(ex)*100)} %</b>${b>0?` et tu perds environ ${f0(b*10)} s/km`:''}. ${b2<0?'La chaleur te coûte : décale tes sorties clés tôt le matin.':'La chaleur ne te pénalise pas de façon visible.'}`);
+  }else p.push('Pas assez de footings avec météo pour conclure (80 dernières sorties récupérées).');
+  prose('#meteo-text',p);
+  mount('#c-meteo',240,(svg,w,h)=>{
+    if(E.length<3){svg.append(el('text',{x:0,y:20},'Pas assez de données'));return}
+    const m={l:44,r:10,t:10,b:34},iw=w-m.l-m.r,ih=h-m.t-m.b;
+    const xs=E.map(r=>r.temp),ys=E.map(mpb);
+    let x0=Math.floor(Math.min(...xs))-1,x1=Math.ceil(Math.max(...xs))+1,y0=Math.min(...ys),y1=Math.max(...ys);const pd=(y1-y0)*.12||.05;y0-=pd;y1+=pd;
+    const x=lin(x0,x1,m.l,m.l+iw),y=lin(y0,y1,m.t+ih,m.t);
+    ticks(y0,y1,4).forEach(v=>{if(v>=y0&&v<=y1)svg.append(el('line',{class:'grid',x1:m.l,x2:w-m.r,y1:y(v),y2:y(v)}),el('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end'},v.toFixed(2).replace('.',',')))});
+    ticks(x0,x1,6).forEach(v=>{if(v>=x0&&v<=x1)svg.append(el('text',{x:x(v),y:h-8,'text-anchor':'middle'},f0(v)+' °C'))});
+    E.forEach(r=>svg.append(el('circle',{cx:x(r.temp),cy:y(mpb(r)),r:4.5,fill:C.cool,'fill-opacity':.45,stroke:C.cool,'data-tip':`<b>${fmtDY(r.date)}</b><br>${f0(r.temp)} °C${r.hum?` · ${f0(r.hum)} % hum.`:''}<br>${mmss(pace(r))}/km · ${f0(r.hr)} bpm`})));
+  });
+}
+
+function renderBody(){
+  const days=rangeDays||0,p=[];
+  const rh=(D.rhr||[]).map(r=>({date:r.date,v:r.bpm}));
+  trend('#c-rhr',rh,{unit:'bpm',fmt:f0,days,color:C.run,roll:7,h:160});
+  const wk=(D.intensity||[]).filter(w=>inRange(w.week_start,days)).slice(-30);
+  bars('#c-int2',wk.map(w=>({v:w.total_minutes||0,label:fmtD(w.week_start),col:(w.total_minutes||0)>=(w.weekly_goal||150)?C.green:C.cool,tip:`<b>Semaine du ${fmtD(w.week_start)}</b><br>${w.total_minutes||0} min (objectif ${w.weekly_goal||150})${w.vigorous_minutes!=null?`<br>vigoureux ${w.vigorous_minutes} · modéré ${w.moderate_minutes||0}`:''}`})),{h:160,ref:wk[0]?.weekly_goal||150});
+  const bb=(D.bodybattery||[]).filter(d=>d.charged!=null&&inRange(d.date,days)).slice(-60);
+  bars('#c-bb',bb.map(d=>({v:d.charged,label:fmtD(d.date),col:d.charged>=60?C.green:d.charged>=40?C.cool:C.ochre,tip:`<b>${fmtDY(d.date)}</b><br>Rechargé +${d.charged} · dépensé −${d.drained}`})),{h:160});
+  trend('#c-weight',(D.weight||[]).map(r=>({date:r.date,v:r.kg})),{unit:'kg',fmt:f1,days:days||365,line:false,color:C.ochre,h:140});
+  const r7=rh.filter(r=>t(r.date)>=t(today)-7*DAY),r90=rh.filter(r=>t(r.date)>=t(today)-90*DAY);
+  if(r7.length&&r90.length>10)p.push(`FC au repos : <b>${f0(avg(r7.map(r=>r.v)))} bpm</b> cette semaine, ${f0(avg(r90.map(r=>r.v)))} bpm sur 90 jours.`);
+  const fa=D.fitnessage||{};
+  if(fa.fitness_age_years)p.push(`Âge de forme Garmin : <b>${f1(fa.fitness_age_years)} ans</b> pour ${fa.chronological_age_years} ans réels (${f1(fa.achievable_fitness_age_years)} ans atteignable).`);
+  const i0=(D.intensity||[]).slice(-9,-1);
+  if(i0.length)p.push(`Minutes d'intensité : ${i0.filter(w=>(w.total_minutes||0)>=(w.weekly_goal||150)).length} semaines sur ${i0.length} au-dessus de l'objectif.`);
+  const ws=(D.wstress||[]).slice(-4);if(ws.length)p.push(`~Stress moyen des 4 dernières semaines : ${f0(avg(ws.map(w=>w.stress_value)))} / 100.`);
+  const wt=D.weight||[];if(wt.length>1)p.push(`~Poids : ${f1(wt[wt.length-1].kg)} kg (${wt.length} pesées sur l'année).`);
+  prose('#body-text',p.length?p:['Pas de données corporelles.']);
+}
+
+function renderRecords(){
+  const NAME={'1K':'1 km','Mile':'1 mile','5K':'5 km','10K':'10 km','Half Marathon':'Semi-marathon','Marathon':'Marathon','Longest Run':'Plus longue sortie'};
+  const rows=(D.records||[]).map(r=>{const k=Object.keys(NAME).find(k=>r.type.includes(k)||r.type.toLowerCase().includes(k.toLowerCase()));return {name:k?NAME[k]:r.type.replace(/^Best /,''),val:r.value,date:r.date}});
+  $('#records').innerHTML=`<thead><tr><th>Distance</th><th>Record Garmin</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.name}</td><td class="num">${r.val}${r.date?`<br><small>${fmtDY(r.date)}</small>`:''}</td></tr>`).join('')}</tbody>`;
+  const p=['Meilleurs efforts enregistrés par Garmin, toutes sorties confondues.','~Les records ne contiennent que les efforts enregistrés avec cette montre ou ce compte.'];
+  prose('#rec2-text',p);
+}
+
+/* ---------- controls ---------- */
+function press(group,attr,val){group.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[attr]===String(val))))}
+$('#range').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;rangeDays=+b.dataset.d;press($('#range'),'d',rangeDays);logLimit=20;renderAll()});
+$('#filter').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;filter=b.dataset.f;press($('#filter'),'f',filter);logLimit=20;renderLog()});
+function renderAll(){renderBilan();renderVolume();renderPace();renderInt();renderLoad();renderRec();renderPerf();renderLog();[renderMara,renderZone,renderTE,renderForm,renderEff,renderMeteo,renderBody,renderRecords].forEach(fn=>{try{fn()}catch(e){console.error(fn.name,e)}})}
+press($('#range'),'d',rangeDays);press($('#filter'),'f',filter);
+if(!runsAll.length){$('#lead').textContent='Aucune donnée. Lance refresh.ps1 pour récupérer tes sorties.'}else renderAll();
+const TOC=[['t-mara','Marathon'],['t-vol','Volume'],['t-pace','Allure'],['t-int','Intensit\u00e9'],['t-zone','Zones'],['t-te','Effort'],['t-form','Foul\u00e9e'],['t-eff','Efficacit\u00e9'],['t-meteo','Conditions'],['t-load','Charge'],['t-rec','R\u00e9cup\u00e9ration'],['t-body','Corps'],['t-perf','Niveau'],['t-rec2','Records'],['t-log','Journal']];
+{const nav=document.getElementById('toc');nav.innerHTML=TOC.map(([id,l])=>`<a href="#${id}" data-id="${id}">${l}</a>`).join('');
+const links=[...nav.children];
+const setCur=id=>links.forEach(a=>{const on=a.dataset.id===id;if(on){if(a.getAttribute('aria-current')!=='true'){a.setAttribute('aria-current','true');const r=a.getBoundingClientRect();if(r.left<8||r.right>innerWidth-8)nav.scrollTo({left:a.offsetLeft-24,behavior:'smooth'})}}else a.removeAttribute('aria-current')});
+const secs=TOC.map(([id])=>document.getElementById(id)).filter(Boolean);
+const spy=()=>{let cur=null;for(const h of secs){if(h.getBoundingClientRect().top<=170)cur=h.id}setCur(cur)};
+addEventListener('scroll',spy,{passive:true});addEventListener('resize',spy);spy()}
+})();
+</script>
+</body>
+</html>
