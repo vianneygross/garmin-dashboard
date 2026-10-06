@@ -1,5 +1,6 @@
 ﻿# Récupère les données Garmin via le MCP, régénère data.js et ouvre le tableau de bord.
-$ErrorActionPreference = 'Stop'
+param([switch]$Publish)
+$ErrorActionPreference = 'Continue'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $env:Path += ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
 $ca = Join-Path $env:USERPROFILE '.garmin_ca.pem'
@@ -10,4 +11,11 @@ Set-Location $here
 uv run --python 3.12 --with mcp python fetch.py 2>$null
 uv run --python 3.12 --with mcp python fetch_details.py 2>$null
 uv run --python 3.12 python build.py
-Start-Process (Join-Path $here 'index.html')
+if ($Publish) {
+  $env:GIT_TERMINAL_PROMPT = '0'
+  git add data.js index.html
+  git diff --cached --quiet
+  if ($LASTEXITCODE -ne 0) { git commit -qm ("Mise a jour " + (Get-Date -Format 'yyyy-MM-dd HH:mm')); git push -q }
+} else {
+  Start-Process (Join-Path $here 'index.html')
+}
