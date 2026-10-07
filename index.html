@@ -33,6 +33,7 @@ a{color:inherit}
 header.top{position:sticky;top:0;z-index:30;padding:0 clamp(12px,2vw,28px);background:color-mix(in srgb,var(--paper) 72%,transparent);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid color-mix(in srgb,var(--rule-2) 60%,transparent)}
 header.top .in{max-width:1760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:50px;padding:7px 0}
 .refresh{color:var(--mute);text-decoration:none;font-size:1.15rem;line-height:1;padding:4px 6px;border-radius:8px}.refresh:hover{background:var(--card-2);color:inherit}
+.rangesel{display:none;font:inherit;font-size:.82rem;color:inherit;background:var(--card-2);border:0;border-radius:10px;padding:6px 10px;min-width:0}
 .brand{font-weight:700;font-size:1.05rem;letter-spacing:-.02em;text-decoration:none}
 .sync{display:none}
 .seg{display:inline-flex;background:color-mix(in srgb,var(--mute) 16%,transparent);border-radius:10px;padding:2px}
@@ -138,7 +139,7 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
 .empty{color:var(--mute);padding:20px 0}
 
 @media (max-width:1320px){.s5{grid-column:span 12}.s3,.s4{grid-column:span 6}.s8{grid-column:span 12}.col.s4{grid-column:span 12;grid-template-columns:1fr 1fr;grid-template-rows:auto}}
-@media (max-width:760px){.mini{grid-template-columns:repeat(2,minmax(0,1fr))}.s3,.s4,.s5,.s6,.s8,.col.s4{grid-column:span 12}.col.s4{grid-template-columns:1fr}.facts.in{grid-template-columns:repeat(2,minmax(0,1fr))}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.card .legend{display:none}header.top .in{gap:8px}header.top .seg{flex:1;min-width:0;justify-content:space-between}.seg button{padding:5px 6px;font-size:.74rem}.card>header{flex-wrap:wrap}.card>header .seg{margin-left:0!important;order:5;flex-basis:100%}}
+@media (max-width:760px){.mini{grid-template-columns:repeat(2,minmax(0,1fr))}.s3,.s4,.s5,.s6,.s8,.col.s4{grid-column:span 12}.col.s4{grid-template-columns:1fr}.facts.in{grid-template-columns:repeat(2,minmax(0,1fr))}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.card .legend{display:none}header.top .in{gap:8px}header.top .seg{display:none}header.top .rangesel{display:block;margin-left:auto}.seg button{padding:5px 6px;font-size:.74rem}.card>header{flex-wrap:wrap}.card>header .seg{margin-left:0!important;order:5;flex-basis:100%}}
 @media (prefers-reduced-motion:reduce){.bar{animation:none}.tip{transition:none}.seg button{transition:none}}
 </style>
 </head>
@@ -155,6 +156,7 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
       <button data-d="365">1 an</button>
       <button data-d="0">Tout</button>
     </div>
+    <select class="rangesel" id="range-sel" aria-label="P&eacute;riode affich&eacute;e"><option value="7">1 semaine</option><option value="30">1 mois</option><option value="90">3 mois</option><option value="180">6 mois</option><option value="365">1 an</option><option value="0">Tout</option></select>
     <a class="refresh" href="https://github.com/vianneygross/garmin-dashboard/actions/workflows/refresh.yml" target="_blank" rel="noopener" title="Ouvrir GitHub puis Run workflow pour actualiser les donn&eacute;es" aria-label="Actualiser les donn&eacute;es">&#8635;</a>
   </div>
 </header>
@@ -769,7 +771,8 @@ function renderRecords(){
 
 /* ---------- controls ---------- */
 function press(group,attr,val){group.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[attr]===String(val))))}
-$('#range').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;rangeDays=+b.dataset.d;press($('#range'),'d',rangeDays);logLimit=6;renderAll()});
+$('#range').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;rangeDays=+b.dataset.d;$('#range-sel').value=rangeDays;press($('#range'),'d',rangeDays);logLimit=6;renderAll()});
+$('#range-sel').addEventListener('change',e=>{rangeDays=+e.target.value;press($('#range'),'d',rangeDays);logLimit=6;renderAll()});
 $('#filter').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;filter=b.dataset.f;press($('#filter'),'f',filter);logLimit=6;renderLog()});
 
 function renderTop(){
@@ -850,7 +853,7 @@ function renderTop(){
   prose('#state-text',ps);
 }
 function renderAll(){renderBilan();renderVolume();renderPace();renderInt();renderLoad();renderRec();renderPerf();renderLog();[renderTop,renderMara,renderForm,renderBody,renderRecords].forEach(fn=>{try{fn()}catch(e){console.error(fn.name,e)}})}
-press($('#range'),'d',rangeDays);press($('#filter'),'f',filter);
+$('#range-sel').value=rangeDays;press($('#range'),'d',rangeDays);press($('#filter'),'f',filter);
 if(!runsAll.length){$('#lead').textContent='Aucune donnée. Lance refresh.ps1 pour récupérer tes sorties.'}else renderAll();
 {let open=null;
 const close=()=>{if(open){open.btn.setAttribute('aria-expanded','false');open.pop.hidden=true;open=null}};
