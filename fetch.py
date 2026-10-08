@@ -38,6 +38,33 @@ async def text(s, tool, args):
         return json.dumps({"error": str(e)})
 
 
+async def activities_page(s, start):
+    for attempt in range(3):
+        response = await text(s, "get_activities", {"start": start, "limit": 100})
+        if not response.strip():
+            if attempt < 2:
+                delay = 3 * (attempt + 1)
+                print(f"get_activities returned an empty response; retrying in {delay}s", flush=True)
+                await asyncio.sleep(delay)
+                continue
+            raise RuntimeError("get_activities returned an empty response after 3 attempts")
+
+        try:
+            page = json.loads(response)
+        except json.JSONDecodeError as e:
+            raise RuntimeError("get_activities returned invalid JSON") from e
+
+        if not isinstance(page, dict):
+            raise RuntimeError("get_activities returned an unexpected response")
+        if "error" in page:
+            raise RuntimeError(f"get_activities failed: {page['error']}")
+        if not isinstance(page.get("activities"), list) or not isinstance(page.get("has_more"), bool):
+            raise RuntimeError("get_activities response is missing activities or has_more")
+        if page["has_more"] and not isinstance(page.get("next_start"), int):
+            raise RuntimeError("get_activities response is missing next_start")
+        return page
+
+
 async def main():
     only = set(sys.argv[1:])
     want = lambda n: not only or n in only
@@ -52,7 +79,7 @@ async def main():
             if want("activities"):
                 acts, start = [], 0
                 while True:
-                    j = json.loads(await text(s, "get_activities", {"start": start, "limit": 100}))
+                    j = await activities_page(s, start)
                     acts += j.get("activities", [])
                     if not j.get("has_more") or start >= 600:
                         break
