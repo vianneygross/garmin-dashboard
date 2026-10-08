@@ -41,18 +41,22 @@ async def text(s, tool, args):
 async def activities_page(s, start):
     for attempt in range(3):
         response = await text(s, "get_activities", {"start": start, "limit": 100})
+        invalid_response = None
         if not response.strip():
-            if attempt < 2:
-                delay = 3 * (attempt + 1)
-                print(f"get_activities returned an empty response; retrying in {delay}s", flush=True)
-                await asyncio.sleep(delay)
-                continue
-            raise RuntimeError("get_activities returned an empty response after 3 attempts")
+            invalid_response = "an empty response"
+        else:
+            try:
+                page = json.loads(response)
+            except json.JSONDecodeError:
+                invalid_response = "invalid JSON"
 
-        try:
-            page = json.loads(response)
-        except json.JSONDecodeError as e:
-            raise RuntimeError("get_activities returned invalid JSON") from e
+        if invalid_response:
+            if attempt == 2:
+                raise RuntimeError(f"get_activities returned {invalid_response} after 3 attempts")
+            delay = 3 * (attempt + 1)
+            print(f"get_activities returned {invalid_response}; retrying in {delay}s", flush=True)
+            await asyncio.sleep(delay)
+            continue
 
         if not isinstance(page, dict):
             raise RuntimeError("get_activities returned an unexpected response")
