@@ -138,7 +138,7 @@ table.log tr:hover td{background:var(--card-2)}
 footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
 .empty{color:var(--mute);padding:20px 0}
 
-@media (max-width:1320px){.s5{grid-column:span 12}.s3,.s4{grid-column:span 6}.s8,.s9,.full-m{grid-column:span 12}.col.s4{grid-column:span 12;grid-template-columns:1fr 1fr;grid-template-rows:auto}}
+@media (max-width:1320px){.s5{grid-column:span 12}.s3,.s4{grid-column:span 6}.s8,.s9,.full-m,.s3:nth-last-child(2){grid-column:span 12}.col.s4{grid-column:span 6;grid-template-rows:auto}}
 @media (max-width:760px){.mini{grid-template-columns:repeat(2,minmax(0,1fr))}.s3,.s4,.s5,.s6,.s8,.s9,.col.s4{grid-column:span 12}.col.s4{grid-template-columns:1fr}.facts.in{grid-template-columns:repeat(2,minmax(0,1fr))}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.card .legend{display:none}header.top .in{gap:8px}header.top .seg{display:none}header.top .rangesel{display:block;margin-left:auto}.seg button{padding:5px 6px;font-size:.74rem}.card>header{flex-wrap:wrap}.card>header .seg{margin-left:0!important;order:5;flex-basis:100%}}
 @media (prefers-reduced-motion:reduce){.bar{animation:none}.tip{transition:none}.seg button{transition:none}}
 </style>
@@ -174,16 +174,16 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
     <dl class="mini" id="last-facts"></dl>
   </article>
 
+  <div class="col s4">
+    <article class="card"><header><h3>Pr&eacute;dit par Garmin vs meilleur r&eacute;el</h3></header><div class="grow"><table class="preds fill" id="preds"></table></div></article>
+  </div>
+
   <article class="card s4 full-m">
     <header><h3>&Eacute;tat de forme Garmin</h3><span class="legend" id="form-when"></span>
       <button class="info" aria-expanded="false" aria-label="Insights : forme" data-pop="state-text">i</button><div class="pop" id="state-text" hidden></div></header>
     <div class="formtop" id="state-top"></div>
     <dl class="mini" id="state-facts"></dl>
   </article>
-
-  <div class="col s4">
-    <article class="card"><header><h3>Pr&eacute;dit par Garmin vs meilleur r&eacute;el</h3></header><div class="grow"><table class="preds fill" id="preds"></table></div></article>
-  </div>
 
   <article class="card s3 full-m">
     <header><h3>Marathon de Paris</h3><span class="legend">compte &agrave; rebours</span></header>
