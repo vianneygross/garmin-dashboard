@@ -71,7 +71,7 @@ header.top .in{max-width:1760px;margin:0 auto;display:flex;align-items:center;ju
 .key i.box{width:8px;height:8px;border:0;border-radius:2px;background:currentColor}
 .scroll{overflow:auto;max-height:190px;margin-right:-6px;padding-right:6px}
 
-.s5{grid-column:span 5}
+.s5{grid-column:span 5}.s9{grid-column:span 9}
 .mini{margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .mini>div{background:var(--card-2);border-radius:12px;padding:6px 10px;min-width:0}
 .mini dt{font-size:.7rem;font-weight:600;color:var(--mute)}
@@ -138,8 +138,8 @@ table.log tr:hover td{background:var(--card-2)}
 footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
 .empty{color:var(--mute);padding:20px 0}
 
-@media (max-width:1320px){.s5{grid-column:span 12}.s3,.s4{grid-column:span 6}.s8{grid-column:span 12}.col.s4{grid-column:span 12;grid-template-columns:1fr 1fr;grid-template-rows:auto}}
-@media (max-width:760px){.mini{grid-template-columns:repeat(2,minmax(0,1fr))}.s3,.s4,.s5,.s6,.s8,.col.s4{grid-column:span 12}.col.s4{grid-template-columns:1fr}.facts.in{grid-template-columns:repeat(2,minmax(0,1fr))}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.card .legend{display:none}header.top .in{gap:8px}header.top .seg{display:none}header.top .rangesel{display:block;margin-left:auto}.seg button{padding:5px 6px;font-size:.74rem}.card>header{flex-wrap:wrap}.card>header .seg{margin-left:0!important;order:5;flex-basis:100%}}
+@media (max-width:1320px){.s5{grid-column:span 12}.s3,.s4{grid-column:span 6}.s8,.s9,.full-m{grid-column:span 12}.col.s4{grid-column:span 12;grid-template-columns:1fr 1fr;grid-template-rows:auto}}
+@media (max-width:760px){.mini{grid-template-columns:repeat(2,minmax(0,1fr))}.s3,.s4,.s5,.s6,.s8,.s9,.col.s4{grid-column:span 12}.col.s4{grid-template-columns:1fr}.facts.in{grid-template-columns:repeat(2,minmax(0,1fr))}.facts{grid-template-columns:repeat(2,minmax(0,1fr))}.card .legend{display:none}header.top .in{gap:8px}header.top .seg{display:none}header.top .rangesel{display:block;margin-left:auto}.seg button{padding:5px 6px;font-size:.74rem}.card>header{flex-wrap:wrap}.card>header .seg{margin-left:0!important;order:5;flex-basis:100%}}
 @media (prefers-reduced-motion:reduce){.bar{animation:none}.tip{transition:none}.seg button{transition:none}}
 </style>
 </head>
@@ -167,28 +167,32 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
 
 <main class="grid">
 
-  <article class="card s5">
+  <article class="card s4">
     <header><h3>Derni&egrave;re sortie</h3><span class="legend" id="last-when"></span>
       <button class="info" aria-expanded="false" aria-label="Insights : derni&egrave;re sortie" data-pop="last-text">i</button><div class="pop" id="last-text" hidden></div></header>
     <p class="runname" id="last-name"></p>
     <dl class="mini" id="last-facts"></dl>
   </article>
 
-  <article class="card s3">
-    <header><h3>Marathon de Paris</h3><span class="legend">compte &agrave; rebours</span></header>
-    <div class="count" id="count-big"></div>
-    <p class="countsub" id="count-sub"></p>
-    <dl class="mini" id="count-facts" style="grid-template-columns:repeat(2,minmax(0,1fr));flex:1;grid-auto-rows:1fr"></dl>
-  </article>
-
-  <article class="card s4">
+  <article class="card s4 full-m">
     <header><h3>&Eacute;tat de forme Garmin</h3><span class="legend" id="form-when"></span>
       <button class="info" aria-expanded="false" aria-label="Insights : forme" data-pop="state-text">i</button><div class="pop" id="state-text" hidden></div></header>
     <div class="formtop" id="state-top"></div>
     <dl class="mini" id="state-facts"></dl>
   </article>
 
-  <article class="card s8">
+  <div class="col s4">
+    <article class="card"><header><h3>Pr&eacute;dit par Garmin vs meilleur r&eacute;el</h3></header><div class="grow"><table class="preds fill" id="preds"></table></div></article>
+  </div>
+
+  <article class="card s3 full-m">
+    <header><h3>Marathon de Paris</h3><span class="legend">compte &agrave; rebours</span></header>
+    <div class="count" id="count-big"></div>
+    <p class="countsub" id="count-sub"></p>
+    <dl class="mini" id="count-facts" style="grid-template-columns:repeat(2,minmax(0,1fr));flex:1;grid-auto-rows:1fr"></dl>
+  </article>
+
+  <article class="card s9">
     <header><h3>Marathon de Paris</h3>
       <span class="legend"><span class="key" style="color:var(--cool)"><i class="box"></i>r&eacute;alis&eacute;</span><span class="key" style="color:var(--mute)"><i class="box"></i>pont sugg&eacute;r&eacute;</span><span class="key" style="color:var(--cool-soft)"><i class="box"></i>plan</span><span class="key" style="color:var(--run)"><i class="dot"></i>r&eacute;alis&eacute; vs plan</span></span>
       <button class="info" aria-expanded="false" aria-label="Insights : marathon" data-pop="mara-text">i</button>
@@ -196,10 +200,6 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
     <dl class="facts in" id="mara-facts"></dl>
     <div class="grow" id="c-mara" role="img" aria-label="Volume hebdomadaire r&eacute;alis&eacute; et plan jusqu'au marathon"></div>
   </article>
-
-  <div class="col s4">
-    <article class="card"><header><h3>Pr&eacute;dit par Garmin vs meilleur r&eacute;el</h3></header><div class="grow"><table class="preds fill" id="preds"></table></div></article>
-  </div>
 
   <article class="card s4">
     <header><h3>Volume</h3><span class="legend"><span class="key" style="color:var(--cool)"><i class="box"></i>km/sem.</span><span class="key" style="color:var(--run)"><i></i>moy. 4 sem.</span></span>
