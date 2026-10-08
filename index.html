@@ -819,9 +819,17 @@ function renderTop(){
   $('#count-big').textContent=dRace>=0?`J\u2212${dRace}`:'Termin\u00e9';
   $('#count-sub').textContent=`${fmtDY(RACE.date)} \u00b7 ${Math.floor(dRace/7)} sem. et ${dRace%7} j`;
   const wk=Math.floor((t(nowIso)-t(planStart))/(7*DAY))+1;
+  const cvFull=weeksAll.filter(w=>w.k!==weekStart(today)),cv4=avg(cvFull.slice(-4).map(w=>w.km));
+  const cvFrom=(cvFull.slice(-12)[0]||{k:'9999'}).k,cvRuns=runsAll.filter(r=>r.date>=cvFrom);
+  const cvLong=cvRuns.reduce((m,r)=>Math.max(m,r.km),0),cv25=cvRuns.filter(r=>r.km>=25).length;
+  const cvG=((((D.predictions||{}).predictions||{}).marathon)||{}).time_seconds;
   $('#count-facts').innerHTML=[
     ['Pr\u00e9pa',toStart>0?`J\u2212${toStart}`:`S${Math.min(18,wk)}/18`,toStart>0?`d\u00e9but le ${fmtD(planStart)}`:'semaine du plan'],
-    ['Objectif',hms(RACE.target),`${mmss(RACE.target/42.195)}/km`]
+    ['Objectif',hms(RACE.target),`${mmss(RACE.target/42.195)}/km`],
+    ['Volume actuel',cv4?`${f0(cv4)} km`:'\u2013',cv4?`par sem. (4 derni\u00e8res) \u00b7 plan : 49`:''],
+    ['Sortie longue',cvLong?`${f1(cvLong)} km`:'\u2013',`max sur 12 sem. \u00b7 plan : 32`],
+    ['Pr\u00e9diction Garmin',cvG?hms(cvG):'\u2013',cvG?`${cvG<=RACE.target?'\u2212':'+'}${hm(Math.abs(RACE.target-cvG))} vs objectif`:''],
+    ['Sorties 25 km+',String(cv25),'sur 12 semaines']
   ].map(([a,b,c])=>`<div><dt>${a}</dt><dd>${b}</dd><small>${c}</small></div>`).join('');
 
   // \u00e9tat de forme
