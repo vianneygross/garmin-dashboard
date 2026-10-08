@@ -783,7 +783,7 @@ function renderTop(){
     const ago=dayDiff(L.date);
     $('#last-when').textContent=(ago<=0?"aujourd'hui":ago===1?'hier':`il y a ${ago} j`)+` \u00b7 ${L.time||''}`;
     $('#last-name').textContent=`${L.name} \u00b7 ${fmtD(L.date,{weekday:'long',day:'numeric',month:'long'})}`;
-    const TL={VO2MAX:'VO\u2082 max',THRESHOLD:'Seuil',TEMPO:'Tempo',BASE:'Base',RECOVERY:'R\u00e9cup\u00e9ration',ANAEROBIC_CAPACITY:'Ana\u00e9robie',SPRINT:'Sprint'};
+    const TL={VO2MAX:'VO\u2082 max',LACTATE_THRESHOLD:'Seuil',THRESHOLD:'Seuil',TEMPO:'Tempo',AEROBIC_BASE:'Base a\u00e9robie',BASE:'Base',RECOVERY:'R\u00e9cup\u00e9ration',ANAEROBIC_CAPACITY:'Ana\u00e9robie',SPRINT:'Sprint'};
     const tiles=[
       ['Distance',`${f1(L.km)} km`,L.event==='race'?'course':''],
       ['Temps',hms(L.sec),''],
