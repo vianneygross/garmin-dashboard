@@ -43,6 +43,8 @@ async def activities_page(s, start):
         response = await text(s, "get_activities", {"start": start, "limit": 100})
         invalid_response = None
         detail = ""
+        if response.strip().lower().startswith("no activities found"):
+            return {"activities": [], "has_more": False}
         if not response.strip():
             invalid_response = "an empty response"
         else:
