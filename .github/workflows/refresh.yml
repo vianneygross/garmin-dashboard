@@ -1,7 +1,7 @@
 name: Refresh Garmin data
 on:
   schedule:
-    - cron: "7 4-21 * * *"
+    - cron: "7 4-20/2 * * *"
   workflow_dispatch:
 permissions:
   contents: write
