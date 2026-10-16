@@ -477,7 +477,7 @@ function renderInt(){
 }
 
 /* ---------- load ---------- */
-const STATUS={PRODUCTIVE:'productif',MAINTAINING:'maintien',PEAKING:'affûtage',RECOVERY:'récupération',UNPRODUCTIVE:'improductif',DETRAINING:'désentraînement',OVERREACHING:'surcharge',NO_STATUS:'sans statut'};
+const STATUS={PRODUCTIVE:'productif',MAINTAINING:'maintien',PEAKING:'affûtage',RECOVERY:'récupération',UNPRODUCTIVE:'improductif',DETRAINING:'désentraînement',OVERREACHING:'surcharge',STRAINED:'tendu',NO_STATUS:'sans statut'};
 const stLabel=s=>{const k=Object.keys(STATUS).find(k=>(s||'').startsWith(k));return k?STATUS[k]:(s||'inconnu').toLowerCase()};
 const FEED={ANAEROBIC_SHORTAGE:'pas assez de travail intense court (VMA, côtes, sprints)',AEROBIC_LOW_SHORTAGE:'pas assez d\'endurance facile',AEROBIC_HIGH_SHORTAGE:'pas assez d\'allure soutenue',BALANCED:'bien équilibré',AEROBIC_LOW_SURPLUS:'beaucoup d\'endurance facile',AEROBIC_HIGH_SURPLUS:'beaucoup d\'allure soutenue',ANAEROBIC_SURPLUS:'beaucoup de travail intense'};
 function renderLoad(){
@@ -836,7 +836,7 @@ function renderTop(){
   const st=D.status||{};
   const lastOf=a=>(a||[]).filter(x=>x).slice(-1)[0];
   const sl=lastOf((D.sleep||[]).filter(x=>x.sleep_score!=null)),hv=lastOf((D.hrv||[]).filter(x=>x.last_night_avg_hrv_ms!=null)),rh=lastOf(D.rhr),fa=D.fitnessage;
-  const TSN={PRODUCTIVE:['Productif','good'],PEAKING:['Pic de forme','good'],MAINTAINING:['Maintien','cool'],RECOVERY:['R\u00e9cup\u00e9ration','cool'],UNPRODUCTIVE:['Improductif','warn'],OVERREACHING:['Surcharge','bad'],DETRAINING:['D\u00e9sentra\u00eenement','warn'],NO_STATUS:['Sans statut','']};
+  const TSN={PRODUCTIVE:['Productif','good'],PEAKING:['Pic de forme','good'],MAINTAINING:['Maintien','cool'],RECOVERY:['R\u00e9cup\u00e9ration','cool'],UNPRODUCTIVE:['Improductif','warn'],OVERREACHING:['Surcharge','bad'],STRAINED:['Tendu','warn'],DETRAINING:['D\u00e9sentra\u00eenement','warn'],NO_STATUS:['Sans statut','']};
   const key=String(st.training_status_feedback||'').replace(/_\d+$/,'');
   const [tl,tc]=TSN[key]||[key||'\u2013',''];
   const AC={OPTIMAL:'optimale',LOW:'basse',HIGH:'\u00e9lev\u00e9e',VERY_HIGH:'tr\u00e8s \u00e9lev\u00e9e'};
