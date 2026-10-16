@@ -485,7 +485,7 @@ function renderLoad(){
   const st=D.status||{},lastL=(D.load||[]).slice(-1)[0];
   const p=[];
   if(lastL){
-    p.push(`Statut Garmin : <b>${stLabel(lastL.training_status||st.training_status_feedback)}</b>. Ratio de charge aiguë sur chronique : <b>${lastL.acwr??st.load_ratio}</b> (${(lastL.acwr_status||st.acwr_status||'').toLowerCase()==='optimal'?'zone optimale':(lastL.acwr_status||st.acwr_status||'').toLowerCase()}).`);
+    p.push(`Statut Garmin : <b>${stLabel(lastL.training_status||st.training_status_feedback)}</b>. Ratio de charge aiguë sur chronique : <b>${lastL.acwr??st.load_ratio}</b> (${(()=>{const a=lastL.acwr_status||st.acwr_status||'';return a==='OPTIMAL'||a==='optimal'?'zone optimale':({LOW:'zone basse',HIGH:'zone \u00e9lev\u00e9e',VERY_HIGH:'zone tr\u00e8s \u00e9lev\u00e9e'}[a.toUpperCase()]||a.toLowerCase())})()}).`);
     const tsb=lastL.tsb;
     p.push(`Forme (chronique − aiguë) : <b>${tsb>0?'+':''}${f0(tsb)}</b>. ${tsb<-30?'Fatigue marquée.':tsb<-10?'Fatigue modérée, normale en phase de charge.':tsb<10?'Zone neutre.':'Tu es frais.'}`);
   }
