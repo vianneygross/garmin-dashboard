@@ -684,7 +684,7 @@ function renderMara(){
     const b=sum(xs.map((x,i)=>(x-mx2)*(ys[i]-my)))/(sum(xs.map(x=>(x-mx2)**2))||1);
     const hr=my+b*(tp-mx2);
     const hmax=Math.max(...runsAll.filter(r=>t(r.date)>=t(today)-365*DAY).map(r=>r.hrmax||0));
-    if(b<0)p.push(`<b>Allures :</b> tenir ${mmss(tp)}/km co\u00fbte environ ${f0(hr)} bpm d'apr\u00e8s tes sorties r\u00e9centes${hmax?` (${f0(hr/hmax*100)} % de ta FC max)`:''}, contre ${M?f0(M.hr):'\u2013'} bpm \u00e0 Annecy. Tes longues \u00e0 5:05\u20135:10 sont plus rapides que tes footings habituels (5:18), mais tes derniers 20 km \u00e0 4:53 pour 152 bpm montrent que c'est tenable : garde un plafond autour de 155 bpm.`);
+    if(b<0)p.push(`<b>Allures :</b> tenir ${mmss(tp)}/km co\u00fbte environ ${f0(hr)} bpm d'apr\u00e8s tes sorties r\u00e9centes${hmax?` (${f0(hr/hmax*100)} % de ta FC max)`:''}, contre ${M?f0(M.hr):'\u2013'} bpm \u00e0 Annecy. Tes longues pr\u00e9vues \u00e0 5:05\u20135:20 sont plus rapides que tes footings habituels (5:18), mais tes derniers 20 km \u00e0 4:53 pour 152 bpm montrent que c'est tenable : garde un plafond autour de 155 bpm.`);
   }
   p.push(`<b>Semi de Mulhouse :</b> \u00e0 deux semaines de Paris, le plan pr\u00e9voit 4:45/km (\u2248 1:40) plut\u00f4t qu'\u00e0 fond. Tu as couru 1:40 l'an dernier et ton niveau actuel est de 1:30 : c'est une vraie marge, garde-la pour le marathon.`);
   p.push(`~Plan mis \u00e0 jour le 21 octobre. Le kilom\u00e9trage de la semaine de course est estim\u00e9 (\u2248) et inclut les 42,2 km du marathon. Le pont est une suggestion.`);
