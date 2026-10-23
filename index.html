@@ -339,7 +339,7 @@ let rangeDays=30,filter='all',logLimit=6;
 $('#sync').textContent=`Dernière synchronisation le ${fmtDY(today)}. ${runsAll.length} sorties de course depuis le ${fmtDY(runsAll[0]?.date||today)}.`;
 
 const rangeStart=days=>days===7?t(weekStart(today)):days===30?t(today.slice(0,8)+'01'):days===366?t(today.slice(0,4)+'-01-01'):t(today)-days*DAY;
-const inRange=(date,days)=>days===0||t(date)>=(days===undefined?rangeStart(rangeDays):t(today)-days*DAY);
+const inRange=(date,days)=>{const d=days===undefined?rangeDays:days;return d===0||t(date)>=(days===undefined?rangeStart(d):t(today)-d*DAY)};
 const sel=()=>runsAll.filter(r=>inRange(r.date));
 const prevStart=()=>{const a=rangeStart(rangeDays);return rangeDays===30?t(iso(a-DAY).slice(0,8)+'01'):rangeDays===366?t((+today.slice(0,4)-1)+'-01-01'):a-rangeDays*DAY};
 const prevSel=()=>rangeDays===0?[]:runsAll.filter(r=>t(r.date)<rangeStart(rangeDays)&&t(r.date)>=prevStart());
