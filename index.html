@@ -332,7 +332,7 @@ function magnetic(e){
   const svg=e.target.closest&&e.target.closest('svg');
   if(!svg)return null;
   const pts=svg.querySelectorAll('circle[data-tip]');
-  let best=null,bd=28*28;
+  let best=null,bd=16*16;
   pts.forEach(c=>{const r=c.getBoundingClientRect(),dx=r.left+r.width/2-e.clientX,dy=r.top+r.height/2-e.clientY,q=dx*dx+dy*dy;if(q<bd){bd=q;best=c}});
   return best;
 }
@@ -607,7 +607,7 @@ function renderPerf(){
     const step=Math.max(14,Math.ceil((t1-t0)/DAY/Math.max(2,Math.floor(iw/90))/7)*7);
     for(let ms=t0;ms<=t1;ms+=step*DAY)svg.append(el('text',{x:x(ms),y:h-8,'text-anchor':'middle'},fmtD(iso(ms))));
     svg.append(el('polyline',{points:V.map(r=>`${x(t(r.date))},${y(r.vo2_max)}`).join(' '),fill:'none',stroke:C.run,'stroke-width':2.5,'stroke-linejoin':'round'}));
-    V.filter((_,i)=>i%3===0).forEach(r=>svg.append(el('circle',{cx:x(t(r.date)),cy:y(r.vo2_max),r:8,fill:'transparent','data-tip':`<b>${fmtDY(r.date)}</b><br>VO₂ max ${f1(r.vo2_max)}`})));
+    V.filter((r,i)=>i===0||i===V.length-1||r.vo2_max!==V[i-1].vo2_max).forEach((r,_,a)=>{const i=V.indexOf(r),dv=i>0?r.vo2_max-V[i-1].vo2_max:0;svg.append(el('circle',{cx:x(t(r.date)),cy:y(r.vo2_max),r:3.6,fill:C.card,stroke:C.run,'stroke-width':2,'data-tip':`<b>${fmtDY(r.date)}</b><br>VO₂ max ${f1(r.vo2_max)}${dv?` (${dv>0?'+':''}${f1(dv)})`:''}`}))});
   });
   const pr=D.predictions?.predictions||{};
   const rows=DISTS.map(([k,km,name])=>{
