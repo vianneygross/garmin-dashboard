@@ -862,7 +862,7 @@ function renderTop(){
 }
 function renderAll(){renderBilan();renderVolume();renderPace();renderInt();renderLoad();renderRec();renderPerf();renderLog();[renderTop,renderMara,renderForm,renderBody,renderRecords].forEach(fn=>{try{fn()}catch(e){console.error(fn.name,e)}})}
 $('#range-sel').value=rangeDays;press($('#range'),'d',rangeDays);press($('#filter'),'f',filter);
-if(!runsAll.length){$('#lead').textContent='Aucune donnée. Lance refresh.ps1 pour récupérer tes sorties.'}else renderAll();
+if(!runsAll.length){$('#lead').textContent='Aucune donnée. Lance le workflow « Refresh Garmin data » pour récupérer tes sorties.'}else renderAll();
 {let open=null;
 const close=()=>{if(open){open.btn.setAttribute('aria-expanded','false');open.pop.hidden=true;open=null}};
 document.addEventListener('click',e=>{

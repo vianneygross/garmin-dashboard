@@ -199,15 +199,17 @@ def fetch_rhr():
 
 def fetch_steps():
     rows = []
-    for a, off in windows(90, 28):
+    for a, off in windows(90, 27):
         rows += get(f"/usersummary-service/stats/steps/daily/{d(a)}/{d(off)}") or []
     save_cache("r_steps_api", rows)
 
 
 def fetch_body_battery():
     rows = []
-    for a, off in windows(90, 28):
+    for a, off in windows(90, 27):
         for r in get("/wellness-service/wellness/bodyBattery/reports/daily", f"?startDate={d(a)}&endDate={d(off)}") or []:
+            if r.get("charged") is None:
+                continue
             rows.append({
                 "date": r["date"],
                 "charged": r.get("charged"),
