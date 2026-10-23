@@ -33,9 +33,12 @@ print("token:", code)
 if code != 200:
     print(body[:200])
     sys.exit(1)
-tok = json.loads(body)
-print("token response keys:", list(tok.keys()) if isinstance(tok, dict) else type(tok).__name__)
-access = tok.get("access_token") or tok.get("accessToken") or tok.get("token")
+try:
+    tok = json.loads(body)
+except ValueError:
+    tok = body.strip()
+print("token response:", list(tok.keys()) if isinstance(tok, dict) else f"plain text, {len(tok)} chars")
+access = tok if isinstance(tok, str) else (tok.get("access_token") or tok.get("accessToken") or tok.get("token"))
 if not access:
     sys.exit("no access token field found")
 H = {"Authorization": "Bearer " + access}
