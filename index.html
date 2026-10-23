@@ -149,14 +149,14 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
     <span class="brand">Dashboard Garmin</span>
     <p class="sync" id="sync"></p>
     <div class="seg" role="group" aria-label="P&eacute;riode affich&eacute;e" id="range">
-      <button data-d="7">1 sem.</button>
+      <button data-d="7">Sem.</button>
       <button data-d="30">1 mois</button>
       <button data-d="90">3 mois</button>
       <button data-d="180">6 mois</button>
       <button data-d="365">1 an</button>
       <button data-d="0">Tout</button>
     </div>
-    <select class="rangesel" id="range-sel" aria-label="P&eacute;riode affich&eacute;e"><option value="7">1 semaine</option><option value="30">1 mois</option><option value="90">3 mois</option><option value="180">6 mois</option><option value="365">1 an</option><option value="0">Tout</option></select>
+    <select class="rangesel" id="range-sel" aria-label="P&eacute;riode affich&eacute;e"><option value="7">Semaine en cours</option><option value="30">1 mois</option><option value="90">3 mois</option><option value="180">6 mois</option><option value="365">1 an</option><option value="0">Tout</option></select>
     <a class="refresh" href="https://github.com/vianneygross/garmin-dashboard/actions/workflows/refresh.yml" target="_blank" rel="noopener" title="Ouvrir GitHub puis Run workflow pour actualiser les donn&eacute;es" aria-label="Actualiser les donn&eacute;es">&#8635;</a>
   </div>
 </header>
@@ -337,7 +337,8 @@ let rangeDays=180,filter='all',logLimit=6;
 
 $('#sync').textContent=`Dernière synchronisation le ${fmtDY(today)}. ${runsAll.length} sorties de course depuis le ${fmtDY(runsAll[0]?.date||today)}.`;
 
-const inRange=(date,days=rangeDays)=>days===0||t(date)>=t(today)-days*DAY;
+const weekStart=t(today)-((new Date(t(today)).getUTCDay()+6)%7)*DAY;
+const inRange=(date,days=rangeDays)=>days===0||t(date)>=(days===7&&days===rangeDays?weekStart:t(today)-days*DAY);
 const sel=()=>runsAll.filter(r=>inRange(r.date));
 const prevSel=()=>rangeDays===0?[]:runsAll.filter(r=>t(r.date)<t(today)-rangeDays*DAY&&t(r.date)>=t(today)-2*rangeDays*DAY);
 
@@ -360,7 +361,7 @@ function renderBilan(){
   const hr=sum(hrR.map(r=>r.hr*r.sec))/(sum(hrR.map(r=>r.sec))||1);
   const pk=sum(P.map(r=>r.km));
   const delta=(a,b,unit,invert,neutral)=>{if(!b||isNaN(a)||isNaN(b))return'';const d=(a-b)/b*100;const good=invert?d<0:d>0;return `<small class="${neutral||Math.abs(d)<1?'':good?'up':'down'}">${d>0?'+':''}${f0(d)} % vs période préc.</small>`};
-  const label=rangeDays?`${rangeDays===7?'7 jours':rangeDays===30?'30 jours':rangeDays===90?'3 mois':rangeDays===180?'6 mois':'12 mois'}`:'tout l\'historique';
+  const label=rangeDays?`${rangeDays===7?'semaine en cours':rangeDays===30?'30 jours':rangeDays===90?'3 mois':rangeDays===180?'6 mois':'12 mois'}`:'tout l\'historique';
   const cadV=median(valid(R.map(r=>r.cad))),powV=median(valid(R.map(r=>r.pow)));
    const hrP=P.filter(r=>r.hr),hrPv=sum(hrP.map(r=>r.hr*r.sec))/(sum(hrP.map(r=>r.sec))||1);
    const cadP=median(valid(P.map(r=>r.cad))),powP=median(valid(P.map(r=>r.pow)));
@@ -432,7 +433,7 @@ function renderPace(){
   const R=sel();
   const E=runsAll.filter(easyRun);
   const rolling=E.map((r,i)=>{const sl=E.slice(Math.max(0,i-5),i+1);return{date:r.date,v:median(sl.map(pace)),hr:median(sl.map(x=>x.hr))}}).filter(p=>inRange(p.date));
-  const eR=E.filter(r=>inRange(r.date)),eP=rangeDays?E.filter(r=>t(r.date)<t(today)-rangeDays*DAY&&t(r.date)>=t(today)-2*rangeDays*DAY):[];
+  const eR=E.filter(r=>inRange(r.date)),eP=rangeDays?E.filter(r=>{const a=rangeDays===7?weekStart:t(today)-rangeDays*DAY;return t(r.date)<a&&t(r.date)>=a-rangeDays*DAY}):[];
   const p=[];
   if(eR.length){
     p.push(`Tes footings (FC moyenne sous 150 bpm, 4 km et plus) tournent à <b>${mmss(median(eR.map(pace)))}/km</b> pour ${f0(median(eR.map(r=>r.hr)))} bpm.`);
