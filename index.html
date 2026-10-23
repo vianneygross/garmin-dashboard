@@ -532,7 +532,7 @@ function renderLoad(){
     hit.addEventListener('pointerleave',()=>{dot.style.display='none';tipEl.classList.remove('on')});
   });
   const b=D.balance||{};
-  const items=[['aerobic_low','Endurance facile'],['aerobic_high','Allure soutenue'],['anaerobic','Intense court']].filter(([k])=>b[k]);
+  const items=[['anaerobic','Intense court'],['aerobic_high','Allure soutenue'],['aerobic_low','Endurance facile']].filter(([k])=>b[k]);
   const SL={within:'dans la cible',below:'sous la cible',above:'au-dessus de la cible'};
   $('#balance').innerHTML='';
   items.forEach(([k,name],i)=>{
