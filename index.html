@@ -275,7 +275,7 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
 
 </main>
 
-<footer>Donn&eacute;es lues sur Garmin Connect via le serveur MCP garmin_mcp. Les allures utilisent le temps en mouvement, la FC moyenne est celle de la sortie enti&egrave;re.</footer>
+<footer>Les allures utilisent le temps en mouvement, la FC moyenne est celle de la sortie enti&egrave;re.</footer>
 </div>
 <div class="tip" id="tip" role="tooltip"></div>
 
@@ -686,10 +686,23 @@ function renderMara(){
   const bridge=[35,37,40,32,42,44,46,48].slice(0,bridgeN);
   W.slice(-12).forEach(w=>items.push({v:w.km,label:fmtD(w.k),col:C.cool,tip:`<b>Semaine du ${fmtD(w.k)}</b><br>${f0(w.km)} km`}));
   bridge.forEach((v,i)=>{const k=iso(t(weekStart(today))+(i+(W[W.length-1].k===weekStart(today)?1:0))*7*DAY);items.push({v,label:fmtD(k),col:C.mute,tip:`<b>Semaine du ${fmtD(k)}</b><br>\u2248 ${v} km, pont sugg\u00e9r\u00e9`})});
+  const cv4x=avg(weeksAll.filter(w=>w.k!==weekStart(today)).slice(-4).map(w=>w.km));
   const wkAct=k=>{const x=W.find(q=>q.k===k);return x?x.km:0},wkLong=k=>runsAll.filter(r=>weekStart(r.date)===k).reduce((m,r)=>Math.max(m,r.km),0),started=k=>t(k)<=t(today),curK=weekStart(today);
   PLAN.forEach((w,i)=>{const last=i===PLAN.length-1,st=started(w.k),ac=st?wkAct(w.k):null,live=w.k===curK;items.push({v:w.km,v2:ac,label:fmtD(w.k),col:last?C.run:C.coolSoft,tip:`<b>Semaine ${i+1} \u00b7 ${fmtD(w.k)}</b><br>Pr\u00e9vu : ${w.est?'\u2248 ':''}${w.km} km${st?`<br>R\u00e9alis\u00e9 : ${f0(ac)} km${live?' (en cours)':''}`:''}${w.sl&&!last?`<br>Sortie longue ${w.sl} km${w.mp?`, dont \u2248 ${f0(w.mp)} km \u00e0 allure marathon`:''}`:''}${last?'<br>Marathon de Paris':''}`})});
   const trk=PLAN.map((w,i)=>({w,i})).filter(o=>started(o.w.k));
   bars('#c-mara',items,{h:195});
+  {
+    const done=PLAN.filter(w=>started(w.k)&&w.k!==curK),cum=sum(done.map(w=>wkAct(w.k)-w.km));
+    const cw=PLAN.find(w=>w.k===curK),tile=[...document.querySelectorAll('#count-facts div')].find(n=>n.querySelector('dt')?.textContent==='Volume actuel');
+    if(tile){
+      let a,b,c;
+      if(done.length){a=Math.abs(cum)<1?'\u00c0 jour':`${f0(Math.abs(cum))} km`;b=Math.abs(cum)<1?'':cum<0?'de retard':"d'avance";c=`cumul S1\u2013S${done.length}`+(cw?` \u00b7 sem. en cours : ${f0(wkAct(curK))}/${cw.km} km`:'')}
+      else{const gap=PLAN[0].km-cv4x;a=`${f0(Math.abs(gap))} km`;b=gap>0?'de retard':"d'avance";c=`volume hebdo (${f0(cv4x)}) vs S1 : ${PLAN[0].km} km`}
+      tile.querySelector('dt').textContent='Volume vs plan';
+      tile.querySelector('dd').textContent=b?`${a} ${b}`:a;
+      tile.querySelector('small').textContent=c;
+    }
+  }
 
   const gapV=eq?tgt-eq:null,cur4=avg(full.slice(-4).map(w=>w.km));
   const shares=PLAN.filter(w=>w.sl>=28&&w.sl<40).map(w=>w.sl/w.km);
