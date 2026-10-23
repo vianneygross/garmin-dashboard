@@ -99,6 +99,7 @@ svg{display:block;width:100%;overflow:visible}
 svg text{font-family:var(--sans);font-size:11px;fill:var(--mute-2)}
 svg .grid{stroke:var(--rule);stroke-width:1}
 [data-tip]{cursor:default}
+circle.mag{stroke:var(--ink);stroke-width:2;fill-opacity:1!important}
 .bar{transform-box:fill-box;transform-origin:50% 100%;animation:rise 1s var(--ease) both}
 @keyframes rise{from{transform:scaleY(.02);opacity:.2}to{transform:none;opacity:1}}
 .tip{position:fixed;z-index:80;pointer-events:none;background:color-mix(in srgb,var(--ink) 92%,transparent);color:var(--paper);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);font-size:.8rem;line-height:1.4;padding:8px 11px;border-radius:12px;max-width:260px;opacity:0;transform:translateY(4px) scale(.98);transition:opacity .15s,transform .2s var(--ease);box-shadow:0 12px 30px -8px rgba(0,0,0,.35)}
@@ -326,8 +327,25 @@ function mount(id,height,draw){
 }
 const tipEl=$('#tip');
 function tip(html,x,y){tipEl.innerHTML=html;tipEl.classList.add('on');const r=tipEl.getBoundingClientRect();let left=x+14,top=y-r.height-12;if(left+r.width>innerWidth-8)left=x-r.width-14;if(top<8)top=y+16;tipEl.style.left=left+'px';tipEl.style.top=top+'px'}
-document.addEventListener('pointermove',e=>{const n=e.target.closest&&e.target.closest('[data-tip]');if(n)tip(n.getAttribute('data-tip'),e.clientX,e.clientY);else tipEl.classList.remove('on')});
-document.addEventListener('pointerdown',e=>{const n=e.target.closest&&e.target.closest('[data-tip]');if(n)tip(n.getAttribute('data-tip'),e.clientX,e.clientY);else tipEl.classList.remove('on')});
+let magnet=null;
+function magnetic(e){
+  const svg=e.target.closest&&e.target.closest('svg');
+  if(!svg)return null;
+  const pts=svg.querySelectorAll('circle[data-tip]');
+  let best=null,bd=28*28;
+  pts.forEach(c=>{const r=c.getBoundingClientRect(),dx=r.left+r.width/2-e.clientX,dy=r.top+r.height/2-e.clientY,q=dx*dx+dy*dy;if(q<bd){bd=q;best=c}});
+  return best;
+}
+function hoverTip(e){
+  let n=e.target.closest&&e.target.closest('[data-tip]');
+  if(!n||n.tagName==='circle')n=magnetic(e)||n;
+  if(magnet&&magnet!==n)magnet.classList.remove('mag');
+  magnet=n&&n.tagName==='circle'?n:null;
+  if(magnet)magnet.classList.add('mag');
+  if(n)tip(n.getAttribute('data-tip'),e.clientX,e.clientY);else tipEl.classList.remove('on');
+}
+document.addEventListener('pointermove',hoverTip);
+document.addEventListener('pointerdown',hoverTip);
 const prose=(id,paras)=>{$(id).innerHTML=paras.map((p,i)=>`<p${i&&p.startsWith('~')?' class="note"':''}>${p.replace(/^~/,'')}</p>`).join('')};
 const rotate=(s,x,y)=>el('text',{x,y,'text-anchor':'end',transform:`rotate(-35 ${x} ${y})`},s);
 
