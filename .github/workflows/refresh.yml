@@ -29,15 +29,19 @@ jobs:
         run: |
           mkdir -p ~/.garminconnect
           [ -f ~/.garminconnect/garmin_tokens.json ] || printf '%s' "$GARMIN_TOKENS" > ~/.garminconnect/garmin_tokens.json
-      - name: Fetch and build
+      - name: Fetch (official API)
+        env:
+          GARMIN_API_KEY: ${{ secrets.GARMIN_API_KEY }}
+        run: python3 fetch_api.py
+      - name: Fetch residual data (MCP, best effort)
+        continue-on-error: true
         env:
           PYTHONIOENCODING: utf-8
         run: |
           uv run --python 3.12 --with mcp python fetch.py
-          uv run --python 3.12 python check_fetch.py
           uv run --python 3.12 --with mcp python fetch_details.py
-          uv run --python 3.12 python check_fetch.py
-          uv run --python 3.12 python build.py
+      - name: Build
+        run: python3 build.py
       - name: Publish
         run: |
           git config user.name "garmin-dashboard-bot"

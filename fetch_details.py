@@ -1,4 +1,5 @@
-"""Fetches per-run and daily details through garmin_mcp. Everything is cached in ./raw/cache so reruns are incremental."""
+"""Fetches the details the Personal API does not expose (zones, weather, splits, records...) through garmin_mcp.
+Everything is cached in ./raw/cache so reruns are incremental. Failures are tolerated."""
 import asyncio, os, json, sys, datetime as dt
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -29,7 +30,10 @@ async def cached(s, key, tool, args, ttl_days=None):
         res = await s.call_tool(tool, args)
         txt = res.content[0].text if res.content else ""
     except Exception as e:
-        txt = "ERR " + str(e)
+        print(f"WARN {key}: {e}", flush=True)
+        return
+    if not txt.strip() or txt.lstrip().startswith('{"error"'):
+        return
     with open(p, "w", encoding="utf-8") as f:
         f.write(txt)
 
@@ -46,38 +50,13 @@ async def main():
             # global, small calls (refreshed every run)
             glob = [
                 ("personal_record", "get_personal_record", {}),
-                ("fitnessage", "get_fitnessage_data", {"date": d(1), "details": False}),
-                ("weigh", "get_weigh_ins", {"start_date": d(365), "end_date": d(0)}),
                 ("intensity", "get_weekly_intensity_minutes", {"end_date": d(0), "weeks": 52}),
                 ("weekly_stress", "get_weekly_stress", {"end_date": d(0), "weeks": 52}),
                 ("lactate", "get_lactate_threshold", {"start_date": d(365), "end_date": d(0)}),
-                ("acclimation", "get_acclimation", {"date": d(1)}),
             ]
             for key, tool, args in glob:
                 await cached(s, "g_" + key, tool, args, ttl_days=0)
                 print(key, flush=True)
-            # ranged daily series in chunks
-            for key, tool, total, step in [
-                ("body_battery", "get_body_battery", 90, 29),
-                ("resp", "get_respiration_trend", 90, 29),
-                ("sleep", "get_sleep_summary_range", 180, 29),
-                ("steps", "get_daily_steps", 90, 29),
-            ]:
-                off = 0
-                while off < total:
-                    a = min(off + step, total)
-                    await cached(s, f"r_{key}_{d(a)}_{d(off)}", tool, {"start_date": d(a), "end_date": d(off)}, ttl_days=0 if off == 0 else None)
-                    off = a + 1
-                print(key, flush=True)
-            # daily resting HR (cached by day)
-            for n in range(0, 120):
-                await cached(s, f"rhr_{d(n)}", "get_rhr_day", {"date": d(n)}, ttl_days=0 if n < 2 else None)
-            print("rhr", flush=True)
-            # per-run details
-            for i, rid in enumerate(ids):
-                await cached(s, f"a_{rid}", "get_activity", {"activity_id": rid})
-                if i % 20 == 0:
-                    print("activity", i, "/", len(ids), flush=True)
             recent = ids[-150:]
             for i, rid in enumerate(recent):
                 await cached(s, f"z_{rid}", "get_activity_hr_in_timezones", {"activity_id": rid})
@@ -91,4 +70,7 @@ async def main():
     print("DONE", flush=True)
 
 
-asyncio.run(main())
+try:
+    asyncio.run(main())
+except Exception as e:
+    print(f"WARN MCP indisponible: {e}", flush=True)
