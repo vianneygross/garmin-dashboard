@@ -34,6 +34,10 @@ header.top{position:sticky;top:0;z-index:30;padding:0 clamp(12px,2vw,28px);backg
 header.top .in{max-width:1760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:50px;padding:7px 0}
 .refresh{color:var(--mute);text-decoration:none;font-size:1.15rem;line-height:1;padding:4px 6px;border-radius:8px}.refresh:hover{background:var(--card-2);color:inherit}
 .rangesel{display:none;font:inherit;font-size:.82rem;color:inherit;background:var(--card-2);border:0;border-radius:10px;padding:6px 10px;min-width:0}
+.custom{max-width:1760px;margin:0 auto;padding:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.82rem}
+.custom[hidden]{display:none}
+.custom input{font:inherit;color:inherit;background:var(--card-2);border:0;border-radius:10px;padding:5px 10px;min-height:28px}
+.custom .vs{color:var(--mute)}
 .brand{font-weight:700;font-size:1.05rem;letter-spacing:-.02em;text-decoration:none}
 .sync{display:none}
 .seg{display:inline-flex;background:color-mix(in srgb,var(--mute) 16%,transparent);border-radius:10px;padding:2px}
@@ -153,15 +157,20 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
       <button data-d="7">Sem.</button>
       <button data-d="30">Mois</button>
       <button data-d="90">3 mois</button>
-      <button data-d="180">6 mois</button>
+      <button data-d="-1">Personnalisé</button>
       <button data-d="365">1 an</button>
       <button data-d="366">Année</button>
       <button data-d="0">Tout</button>
     </div>
-    <select class="rangesel" id="range-sel" aria-label="P&eacute;riode affich&eacute;e"><option value="7">Semaine en cours</option><option value="30">Mois en cours</option><option value="90">3 mois</option><option value="180">6 mois</option><option value="365">1 an</option><option value="366">Année en cours</option><option value="0">Tout</option></select>
+    <select class="rangesel" id="range-sel" aria-label="P&eacute;riode affich&eacute;e"><option value="7">Semaine en cours</option><option value="30">Mois en cours</option><option value="90">3 mois</option><option value="-1">Personnalisé</option><option value="365">1 an</option><option value="366">Année en cours</option><option value="0">Tout</option></select>
     <a class="refresh" href="https://github.com/vianneygross/garmin-dashboard/actions/workflows/refresh.yml" target="_blank" rel="noopener" title="Ouvrir GitHub puis Run workflow pour actualiser les donn&eacute;es" aria-label="Actualiser les donn&eacute;es">&#8635;</a>
   </div>
-</header>
+<div class="custom" id="custom" hidden>
+    <label>Du <input type="date" id="cf" aria-label="Début de la plage"></label>
+    <label>au <input type="date" id="ct" aria-label="Fin de la plage"></label>
+    <span class="vs" id="cvs"></span>
+  </div>
+  </header>
 <div class="wrap" id="top">
 
 <p class="lead" id="lead"></p>
@@ -351,15 +360,17 @@ const rotate=(s,x,y)=>el('text',{x,y,'text-anchor':'end',transform:`rotate(-35 $
 /* ---------- state ---------- */
 const runsAll=D.runs.filter(r=>r.km>=0.8);
 const today=D.generated?D.generated.slice(0,10):iso(Date.now());
-let rangeDays=30,filter='all',logLimit=6;
+let rangeDays=30,filter='all',logLimit=6,customFrom=iso(t(today)-29*DAY),customTo=today;
 
 $('#sync').textContent=`Dernière synchronisation le ${fmtDY(today)}. ${runsAll.length} sorties de course depuis le ${fmtDY(runsAll[0]?.date||today)}.`;
 
-const rangeStart=days=>days===7?t(weekStart(today)):days===30?t(today.slice(0,8)+'01'):days===366?t(today.slice(0,4)+'-01-01'):t(today)-days*DAY;
-const inRange=(date,days)=>{const d=days===undefined?rangeDays:days;return d===0||t(date)>=(days===undefined?rangeStart(d):t(today)-d*DAY)};
+const customLen=()=>Math.round((t(customTo)-t(customFrom))/DAY)+1;
+const rangeStart=days=>days===-1?t(customFrom):days===7?t(weekStart(today)):days===30?t(today.slice(0,8)+'01'):days===366?t(today.slice(0,4)+'-01-01'):t(today)-days*DAY;
+const inRange=(date,days)=>{const d=days===undefined?rangeDays:days;if(d===-1)return t(date)>=t(customFrom)&&t(date)<=t(customTo);return d===0||t(date)>=(days===undefined?rangeStart(d):t(today)-d*DAY)};
 const sel=()=>runsAll.filter(r=>inRange(r.date));
-const prevStart=()=>{const a=rangeStart(rangeDays);return rangeDays===30?t(iso(a-DAY).slice(0,8)+'01'):rangeDays===366?t((+today.slice(0,4)-1)+'-01-01'):a-rangeDays*DAY};
+const prevStart=()=>{const a=rangeStart(rangeDays);return rangeDays===-1?a-customLen()*DAY:rangeDays===30?t(iso(a-DAY).slice(0,8)+'01'):rangeDays===366?t((+today.slice(0,4)-1)+'-01-01'):a-rangeDays*DAY};
 const prevSel=()=>rangeDays===0?[]:runsAll.filter(r=>t(r.date)<rangeStart(rangeDays)&&t(r.date)>=prevStart());
+const fmtRange=()=>`${fmtDY(customFrom)} – ${fmtDY(customTo)}`;
 
 /* ---------- weeks ---------- */
 function weeks(runs){
@@ -380,7 +391,7 @@ function renderBilan(){
   const hr=sum(hrR.map(r=>r.hr*r.sec))/(sum(hrR.map(r=>r.sec))||1);
   const pk=sum(P.map(r=>r.km));
   const delta=(a,b,unit,invert,neutral)=>{if(!b||isNaN(a)||isNaN(b))return'';const d=(a-b)/b*100;const good=invert?d<0:d>0;return `<small class="${neutral||Math.abs(d)<1?'':good?'up':'down'}">${d>0?'+':''}${f0(d)} % vs période préc.</small>`};
-  const label=rangeDays?`${rangeDays===7?'semaine en cours':rangeDays===30?'mois en cours':rangeDays===90?'3 mois':rangeDays===180?'6 mois':rangeDays===366?'année en cours':'12 mois'}`:'tout l\'historique';
+  const label=rangeDays?`${rangeDays===7?'semaine en cours':rangeDays===30?'mois en cours':rangeDays===90?'3 mois':rangeDays===-1?fmtRange():rangeDays===180?'6 mois':rangeDays===366?'année en cours':'12 mois'}`:'tout l\'historique';
   const cadV=median(valid(R.map(r=>r.cad))),powV=median(valid(R.map(r=>r.pow)));
    const hrP=P.filter(r=>r.hr),hrPv=sum(hrP.map(r=>r.hr*r.sec))/(sum(hrP.map(r=>r.sec))||1);
    const cadP=median(valid(P.map(r=>r.cad))),powP=median(valid(P.map(r=>r.pow)));
@@ -452,7 +463,7 @@ function renderPace(){
   const R=sel();
   const E=runsAll.filter(easyRun);
   const rolling=E.map((r,i)=>{const sl=E.slice(Math.max(0,i-5),i+1);return{date:r.date,v:median(sl.map(pace)),hr:median(sl.map(x=>x.hr))}}).filter(p=>inRange(p.date));
-  const eR=E.filter(r=>inRange(r.date)),eP=rangeDays?E.filter(r=>{const a=rangeStart(rangeDays),p=rangeDays===30?t(iso(a-DAY).slice(0,8)+'01'):rangeDays===366?t((+today.slice(0,4)-1)+'-01-01'):a-rangeDays*DAY;return t(r.date)<a&&t(r.date)>=p}):[];
+  const eR=E.filter(r=>inRange(r.date)),eP=rangeDays?E.filter(r=>t(r.date)<rangeStart(rangeDays)&&t(r.date)>=prevStart()):[];
   const p=[];
   if(eR.length){
     p.push(`Tes footings (FC moyenne sous 150 bpm, 4 km et plus) tournent à <b>${mmss(median(eR.map(pace)))}/km</b> pour ${f0(median(eR.map(r=>r.hr)))} bpm.`);
@@ -804,8 +815,20 @@ function renderRecords(){
 
 /* ---------- controls ---------- */
 function press(group,attr,val){group.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[attr]===String(val))))}
-$('#range').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;rangeDays=+b.dataset.d;$('#range-sel').value=rangeDays;press($('#range'),'d',rangeDays);logLimit=6;renderAll()});
-$('#range-sel').addEventListener('change',e=>{rangeDays=+e.target.value;press($('#range'),'d',rangeDays);logLimit=6;renderAll()});
+function syncCustom(){
+  const c=rangeDays===-1;$('#custom').hidden=!c;if(!c)return;
+  $('#cf').value=customFrom;$('#ct').value=customTo;$('#ct').min=customFrom;$('#ct').max=today;
+  $('#cvs').textContent=`vs ${fmtDY(iso(t(customFrom)-customLen()*DAY))} – ${fmtDY(iso(t(customFrom)-DAY))}`;
+}
+function setRange(d){rangeDays=d;$('#range-sel').value=d;press($('#range'),'d',d);syncCustom();logLimit=6;renderAll()}
+$('#range').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;setRange(+b.dataset.d)});
+$('#range-sel').addEventListener('change',e=>setRange(+e.target.value));
+['#cf','#ct'].forEach(id=>$(id).addEventListener('change',()=>{
+  let a=$('#cf').value||customFrom,b=$('#ct').value||customTo;
+  if(a>b)[a,b]=[b,a];
+  if(b>today)b=today;
+  customFrom=a;customTo=b;setRange(-1);
+}));
 $('#filter').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;filter=b.dataset.f;press($('#filter'),'f',filter);logLimit=6;renderLog()});
 
 function renderTop(){
