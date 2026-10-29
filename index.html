@@ -111,6 +111,8 @@ circle.mag{stroke:var(--ink);stroke-width:2;fill-opacity:1!important}
 .bullet .l span:first-child{font-weight:600}
 .bullet .l span:last-child{color:var(--mute)}
 .bullet svg{height:22px}
+.bhead b{font-size:1.02rem;font-weight:600}.bhead p{margin:6px 0 4px;font-size:.8rem;color:var(--mute);line-height:1.45}
+.blegend{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:.72rem;color:var(--mute)}.blegend i{width:22px;height:10px;border:1.2px dashed var(--mute);border-radius:6px}
 
 .preds{width:100%;border-collapse:collapse;font-size:.85rem}
 .preds th{font-weight:500;font-size:.72rem;color:var(--mute);text-align:left;padding:0 10px 6px 0;border-bottom:1px solid var(--rule-2);line-height:1.25}
@@ -531,20 +533,30 @@ function renderLoad(){
     hit.addEventListener('pointerleave',()=>{dot.style.display='none';tipEl.classList.remove('on')});
   });
   const b=D.balance||{};
-  const items=[['anaerobic','Intense court'],['aerobic_high','Allure soutenue'],['aerobic_low','Endurance facile']].filter(([k])=>b[k]);
-  const SL={within:'dans la cible',below:'sous la cible',above:'au-dessus de la cible'};
+  const BM={
+    ANAEROBIC_SHORTAGE:['Manque de charge anaérobie','Ajoute des efforts courts et intenses (côtes, sprints, VMA courte) pour développer ta puissance et ta vitesse maximales.'],
+    AEROBIC_LOW_SHORTAGE:['Manque de charge d\'aérobie faible','Tu devrais faire plus d\'activités d\'aérobie faible, comme des courses ou des sessions de vélo faciles. Elles t\'aideront à récupérer et à compenser les activités d\'intensité plus élevée.'],
+    AEROBIC_HIGH_SHORTAGE:['Manque de charge d\'aérobie élevée','Ajoute des séances à allure soutenue (seuil, tempo) pour améliorer ton endurance et ta vitesse sur la durée.'],
+    BALANCED:['Charge équilibrée','Ta charge est bien répartie entre les trois intensités.'],
+    AEROBIC_LOW_SURPLUS:['Excès de charge d\'aérobie faible','Tu fais beaucoup d\'endurance facile : intègre un peu plus d\'intensité.'],
+    AEROBIC_HIGH_SURPLUS:['Excès de charge d\'aérobie élevée','Beaucoup d\'allure soutenue : garde des sorties vraiment faciles pour récupérer.'],
+    ANAEROBIC_SURPLUS:['Excès de charge anaérobie','Beaucoup de travail intense : laisse du temps à la récupération.']
+  };
+  const items=[['anaerobic','Anaérobie','#8b5cf6'],['aerobic_high','Aérobie élevée','#f59e0b'],['aerobic_low','Aérobie faible','#22b8cf']].filter(([k])=>b[k]);
   $('#balance').innerHTML='';
-  items.forEach(([k,name],i)=>{
+  const msg=BM[b.feedback];
+  if(msg){const h=document.createElement('div');h.className='bhead';h.innerHTML=`<b>${msg[0]}</b><p>${msg[1]}</p>`;$('#balance').append(h)}
+  items.forEach(([k,name,col],i)=>{
     const v=b[k],host=document.createElement('div');host.className='bullet';
-    host.innerHTML=`<div class="l"><span>${name}</span><span class="num">${f0(v.load)} · ${SL[v.status]||v.status} (${f0(v.target_min)}–${f0(v.target_max)})</span></div><div id="bl${i}"></div>`;
+    host.innerHTML=`<div class="l"><span>${name}</span><span class="num">${f0(v.load)}</span></div><div id="bl${i}"></div>`;
     $('#balance').append(host);
     mount('#bl'+i,22,(svg,w)=>{
-      const max=Math.max(v.target_max*1.25,v.load*1.08),x=lin(0,max,0,w);
-      svg.append(el('rect',{x:0,y:8,width:w,height:6,fill:C.rule,opacity:.5,rx:4}),
-        el('rect',{x:x(v.target_min),y:3,width:x(v.target_max)-x(v.target_min),height:16,fill:C.coolSoft,opacity:.5,rx:5}),
-        el('rect',{x:0,y:7,width:Math.max(3,x(v.load)),height:8,fill:v.status==='within'?C.green:C.run,rx:4}));
+      const max=Math.max(v.target_max*1.2,v.load*1.08),x=lin(0,max,3,w-3);
+      svg.append(el('rect',{x:x(v.target_min),y:4,width:Math.max(4,x(v.target_max)-x(v.target_min)),height:14,rx:7,fill:'none',stroke:C.mute,'stroke-width':1.2,'stroke-dasharray':'3 3','data-tip':`Plage optimale : ${f0(v.target_min)}\u2013${f0(v.target_max)}`}),
+        el('rect',{x:3,y:8,width:Math.max(6,x(v.load)-3),height:6,rx:3,fill:col,'data-tip':`${name} : ${f0(v.load)}`}));
     });
   });
+  const lg=document.createElement('div');lg.className='blegend';lg.innerHTML='<i></i>Plage optimale';$('#balance').append(lg);
 }
 
 /* ---------- recovery ---------- */
