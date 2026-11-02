@@ -367,6 +367,7 @@ $('#sync').textContent=`Dernière synchronisation le ${fmtDY(today)}. ${runsAll.
 const customLen=()=>Math.round((t(customTo)-t(customFrom))/DAY)+1;
 const rangeStart=days=>days===-1?t(customFrom):days===7?t(weekStart(today)):days===30?t(today.slice(0,8)+'01'):days===366?t(today.slice(0,4)+'-01-01'):t(today)-days*DAY;
 const inRange=(date,days)=>{const d=days===undefined?rangeDays:days;if(d===-1)return t(date)>=t(customFrom)&&t(date)<=t(customTo);return d===0||t(date)>=(days===undefined?rangeStart(d):t(today)-d*DAY)};
+const inTrend=date=>rangeDays===7||rangeDays===30?inRange(date,rangeDays):inRange(date);
 const sel=()=>runsAll.filter(r=>inRange(r.date));
 const prevStart=()=>{const a=rangeStart(rangeDays);return rangeDays===-1?a-customLen()*DAY:rangeDays===30?t(iso(a-DAY).slice(0,8)+'01'):rangeDays===366?t((+today.slice(0,4)-1)+'-01-01'):a-rangeDays*DAY};
 const prevSel=()=>rangeDays===0?[]:runsAll.filter(r=>t(r.date)<rangeStart(rangeDays)&&t(r.date)>=prevStart());
@@ -512,7 +513,7 @@ const STATUS={PRODUCTIVE:'productif',MAINTAINING:'maintien',PEAKING:'affûtage',
 const stLabel=s=>{const k=Object.keys(STATUS).find(k=>(s||'').startsWith(k));return k?STATUS[k]:(s||'inconnu').toLowerCase()};
 const FEED={ANAEROBIC_SHORTAGE:'pas assez de travail intense court (VMA, côtes, sprints)',AEROBIC_LOW_SHORTAGE:'pas assez d\'endurance facile',AEROBIC_HIGH_SHORTAGE:'pas assez d\'allure soutenue',BALANCED:'bien équilibré',AEROBIC_LOW_SURPLUS:'beaucoup d\'endurance facile',AEROBIC_HIGH_SURPLUS:'beaucoup d\'allure soutenue',ANAEROBIC_SURPLUS:'beaucoup de travail intense'};
 function renderLoad(){
-  const L=(D.load||[]).filter(r=>r.ctl!=null&&inRange(r.date,Math.min(rangeDays||150,150)));
+  const L=(D.load||[]).filter(r=>r.ctl!=null&&inTrend(r.date));
   const st=D.status||{},lastL=(D.load||[]).slice(-1)[0];
   const p=[];
   if(lastL){
@@ -562,7 +563,7 @@ function renderLoad(){
 /* ---------- recovery ---------- */
 const HST={BALANCED:'équilibrée',UNBALANCED:'déséquilibrée',LOW:'basse',POOR:'mauvaise'};
 function renderRec(){
-  const H=(D.hrv||[]).filter(r=>r.last_night_avg_hrv_ms!=null&&inRange(r.date,Math.min(rangeDays||150,150)));
+  const H=(D.hrv||[]).filter(r=>r.last_night_avg_hrv_ms!=null&&inTrend(r.date));
   const S=(D.sleep||[]).filter(x=>inRange(x.date));
   const p=[];
   $('#sleep-n').textContent=`${S.length} nuit${S.length>1?'s':''}`;
@@ -605,7 +606,7 @@ function renderRec(){
 /* ---------- performance ---------- */
 const DISTS=[['5K',5,'5 km'],['10K',10,'10 km'],['half_marathon',21.0975,'Semi-marathon'],['marathon',42.195,'Marathon']];
 function renderPerf(){
-  const V=(D.vo2||[]).filter(r=>r.vo2_max!=null&&inRange(r.date,rangeDays||270));
+  const V=(D.vo2||[]).filter(r=>r.vo2_max!=null&&inTrend(r.date));
   const p=[];
   if(V.length){const a=V[0],b=V[V.length-1];p.push(`VO₂ max : <b>${f1(b.vo2_max)}</b>, ${Math.abs(b.vo2_max-a.vo2_max)<.2?'stable':b.vo2_max>a.vo2_max?`en hausse de ${f1(b.vo2_max-a.vo2_max)}`:`en baisse de ${f1(a.vo2_max-b.vo2_max)}`} depuis le ${fmtD(a.date)}.`)}
   p.push('~Les temps prédits par Garmin sont une estimation à partir de ton VO₂ max et de ta charge. Les meilleurs temps réels comptent les sorties à ±2,5 % de la distance.');
@@ -742,7 +743,7 @@ const mpb=r=>r.hr?(r.km*1000/r.sec)*60/r.hr:null;
 const valid=a=>a.filter(v=>v!=null&&!isNaN(v));
 const xAxis=(svg,t0,t1,m,iw,h)=>{const span=(t1-t0)/DAY;const stepDays=Math.max(7,Math.ceil(span/Math.max(2,Math.floor(iw/90))/7)*7);const x=lin(t0,t1,m.l,m.l+iw);for(let ms=t0;ms<=t1;ms+=stepDays*DAY)svg.append(el('text',{x:x(ms),y:h-8,'text-anchor':'middle'},fmtD(iso(ms))));return x};
 function trend(id,pts,o={}){
-  const P=pts.filter(p=>p.v!=null&&!isNaN(p.v)&&inRange(p.date,o.days)).sort((a,b)=>a.date<b.date?-1:1);
+  const P=pts.filter(p=>p.v!=null&&!isNaN(p.v)&&inTrend(p.date)).sort((a,b)=>a.date<b.date?-1:1);
   const fmt=o.fmt||f1;
   mount(id,o.h||180,(svg,w,h)=>{
     if(P.length<3){svg.append(el('text',{x:0,y:20},'Pas assez de données sur la période'));return}
@@ -790,12 +791,12 @@ function renderForm(){
 }
 
 function renderBody(){
-  const days=rangeDays||0,p=[];
+  const p=[];
   const rh=(D.rhr||[]).map(r=>({date:r.date,v:r.bpm}));
-  trend('#c-rhr',rh,{unit:'bpm',fmt:f0,days,color:C.run,roll:7,h:130});
-  const wk=(D.intensity||[]).filter(w=>inRange(w.week_start,days)).slice(-30);
+  trend('#c-rhr',rh,{unit:'bpm',fmt:f0,color:C.run,roll:7,h:130});
+  const wk=(D.intensity||[]).filter(w=>inRange(w.week_start));
   bars('#c-int2',wk.map(w=>({v:w.total_minutes||0,label:fmtD(w.week_start),col:(w.total_minutes||0)>=(w.weekly_goal||150)?C.green:C.cool,tip:`<b>Semaine du ${fmtD(w.week_start)}</b><br>${w.total_minutes||0} min (objectif ${w.weekly_goal||150})${w.vigorous_minutes!=null?`<br>vigoureux ${w.vigorous_minutes} · modéré ${w.moderate_minutes||0}`:''}`})),{h:130,ref:wk[0]?.weekly_goal||150});
-  const bb=(D.bodybattery||[]).filter(d=>d.charged!=null&&inRange(d.date,days)).slice(-60);
+  const bb=(D.bodybattery||[]).filter(d=>d.charged!=null&&inRange(d.date));
   bars('#c-bb',bb.map(d=>({v:d.charged,label:fmtD(d.date),col:d.charged>=60?C.green:d.charged>=40?C.cool:C.ochre,tip:`<b>${fmtDY(d.date)}</b><br>Rechargé +${d.charged} · dépensé −${d.drained}`})),{h:130});
   const r7=rh.filter(r=>t(r.date)>=t(today)-7*DAY),r90=rh.filter(r=>t(r.date)>=t(today)-90*DAY);
   if(r7.length&&r90.length>10)p.push(`FC au repos : <b>${f0(avg(r7.map(r=>r.v)))} bpm</b> cette semaine, ${f0(avg(r90.map(r=>r.v)))} bpm sur 90 jours.`);
