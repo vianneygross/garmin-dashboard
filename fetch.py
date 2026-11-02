@@ -12,7 +12,7 @@ d = lambda n: (today - dt.timedelta(days=n)).isoformat()
 
 SINGLE = [
     ("race_predictions", "get_race_predictions", {}),
-    ("load_balance", "get_training_load_balance", {"date": d(1)}),
+    ("load_balance", "get_training_load_balance", {"date": d(0)}),
     ("training_status", "get_training_status", {"date": d(1)}),
     ("readiness", "get_training_readiness", {"date": d(1)}),
 ]
