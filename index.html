@@ -658,11 +658,12 @@ function renderMara(){
   const semi=preds.filter(x=>x.r.km>=19).sort((a,b)=>a.m-b.m)[0];
   const gp=(D.predictions||{}).predictions||{};
   const garmin=gp.marathon?gp.marathon.time_seconds:null;
-  const eq=semi?semi.m:best;
+  const gDate=(D.predictions||{}).prediction_date;
+  const eq=garmin||(semi?semi.m:best);
   const facts=[
     ['Objectif',hms(tgt),`${mmss(tp)}/km`],
     ['Dans',`${wl} semaines`,fmtDY(RACE.date)],
-    ['Projection marathon',eq?hms(eq):'–',semi?`d'apr\u00e8s ${f1(semi.r.km)} km en ${hms(semi.r.sec)}`:''],
+    ['Projection marathon',eq?hms(eq):'–',garmin?`pr\u00e9diction Garmin${gDate?` au ${fmtD(gDate)}`:''}`:semi?`d'apr\u00e8s ${f1(semi.r.km)} km en ${hms(semi.r.sec)}`:''],
     ['Marge sur l\'objectif',eq?`${eq<tgt?'\u2212':'+'}${hm(Math.abs(tgt-eq)).replace(' min',' min')}`:'–',eq&&eq<tgt?'sur le papier':'\u00e0 combler']
   ];
   $('#mara-facts').innerHTML=facts.map(([a,b,c])=>`<div><dt>${a}</dt><dd>${b}</dd><small>${c}</small></div>`).join('');
@@ -717,9 +718,10 @@ function renderMara(){
     }
   }
 
-  const gapV=eq?tgt-eq:null,cur4=avg(full.slice(-4).map(w=>w.km));
+  const gapV=semi?tgt-semi.m:null,gapG=garmin?tgt-garmin:null,cur4=avg(full.slice(-4).map(w=>w.km));
   const shares=PLAN.slice(8,14).map(w=>w.sl/w.km);
   p.push(`Ton objectif de <b>${hms(tgt)}</b> demande <b>${mmss(tp)}/km</b> sur 42,2 km, soit environ ${f0(pace(M||{sec:tp,km:1})-tp)} s/km plus vite qu'\u00e0 Annecy.`);
+  if(garmin)p.push(`Garmin pr\u00e9dit actuellement un marathon en <b>${hms(garmin)}</b> d'apr\u00e8s ton VO\u2082 max et ta charge${gDate?` (au ${fmtD(gDate)})`:''} : ${gapG>0?`${hm(gapG)} sous ton objectif`:`${hm(-gapG)} \u00e0 aller chercher`}. Cette projection \u00e9volue avec tes performances.`);
   if(semi)p.push(`Ton dernier semi (${f1(semi.r.km)} km en ${hms(semi.r.sec)}, ${fmtD(semi.r.date)}) projette un marathon \u00e0 <b>${hms(semi.m)}</b> : la vitesse est l\u00e0, ${gapV>0?`avec ${hm(gapV)} de marge`:'mais il reste du chrono \u00e0 aller chercher'}. Le facteur limitant est l'endurance, et c'est ce que ton plan travaille.`);
   p.push(`<b>Ton plan est solide.</b> Il monte de ${PLAN[0].km} \u00e0 ${pk.km} km, avec une d\u00e9charge toutes les 4 semaines, ${sl25.length} sorties de 25 km et plus (${sl28.length} de 28 km et plus, sortie max \u00e0 ${Math.max(...PLAN.filter(w=>w.sl<40).map(w=>w.sl))} km) et environ ${f0(mpTot)} km \u00e0 allure marathon. Annecy : pic \u00e0 ${f0(mx(prep))} km et sortie max \u00e0 ${f0(longP)} km.`);
   p.push(`<b>Le pont avant le 30 novembre est le vrai risque.</b> Tu es \u00e0 ${f0(cur4)} km par semaine, le plan d\u00e9marre \u00e0 ${PLAN[0].km} : ${f0((PLAN[0].km/cur4-1)*100)} % de plus d'un coup. Il reste ${bridgeN} semaines : monte d'environ 10 % par semaine vers 45\u201348 km (barres grises), avec une d\u00e9charge.`);
