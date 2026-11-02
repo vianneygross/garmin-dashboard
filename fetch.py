@@ -13,8 +13,8 @@ d = lambda n: (today - dt.timedelta(days=n)).isoformat()
 SINGLE = [
     ("race_predictions", "get_race_predictions", {}),
     ("load_balance", "get_training_load_balance", {"date": d(0)}),
-    ("training_status", "get_training_status", {"date": d(1)}),
-    ("readiness", "get_training_readiness", {"date": d(1)}),
+    ("training_status", "get_training_status", {"date": d(0)}),
+    ("readiness", "get_training_readiness", {"date": d(0)}),
 ]
 # (name, tool, total days back, max window days)
 RANGED = [
@@ -70,9 +70,9 @@ async def main():
             for name, tool, args in SINGLE:
                 if want(name):
                     t = await text(s, tool, args)
-                    if name == "load_balance" and not t.lstrip().startswith("{"):
+                    if "date" in args and not t.lstrip().startswith(("{", "[")):
                         t = await text(s, tool, {"date": d(1)})
-                        if not t.lstrip().startswith("{"):
+                        if not t.lstrip().startswith(("{", "[")):
                             t = ""
                     if usable(t):
                         save(name, t)
