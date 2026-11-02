@@ -663,8 +663,8 @@ function renderMara(){
   const facts=[
     ['Objectif',hms(tgt),`${mmss(tp)}/km`],
     ['Dans',`${wl} semaines`,fmtDY(RACE.date)],
-    ['Projection marathon',eq?hms(eq):'–',garmin?`pr\u00e9diction Garmin${gDate?` au ${fmtD(gDate)}`:''}`:semi?`d'apr\u00e8s ${f1(semi.r.km)} km en ${hms(semi.r.sec)}`:''],
-    ['Marge sur l\'objectif',eq?`${eq<tgt?'\u2212':'+'}${hm(Math.abs(tgt-eq)).replace(' min',' min')}`:'–',eq&&eq<tgt?'sur le papier':'\u00e0 combler']
+    ['Projection marathon',eq?hms(eq):'–',eq?'sur le papier':''],
+    ['Marge sur l\'objectif',eq?`${eq<tgt?'\u2212':'+'}${hm(Math.abs(tgt-eq)).replace(' min',' min')}`:'–',eq&&eq<tgt?'d\'avance':'\u00e0 combler']
   ];
   $('#mara-facts').innerHTML=facts.map(([a,b,c])=>`<div><dt>${a}</dt><dd>${b}</dd><small>${c}</small></div>`).join('');
   let rows=preds.map(({r,m})=>`<tr><td>${fmtDY(r.date)}<br><small>${f1(r.km)} km en ${hms(r.sec)} \u00b7 ${mmss(pace(r))}/km</small></td><td class="num">${hms(m)}<br><small>${m<=tgt?'sous l\'objectif':'+'+hm(m-tgt)}</small></td></tr>`);
