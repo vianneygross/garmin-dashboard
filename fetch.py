@@ -70,6 +70,10 @@ async def main():
             for name, tool, args in SINGLE:
                 if want(name):
                     t = await text(s, tool, args)
+                    if name == "load_balance" and not t.lstrip().startswith("{"):
+                        t = await text(s, tool, {"date": d(1)})
+                        if not t.lstrip().startswith("{"):
+                            t = ""
                     if usable(t):
                         save(name, t)
                     else:

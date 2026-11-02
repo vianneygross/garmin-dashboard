@@ -186,7 +186,7 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
   </article>
 
   <div class="col s4">
-    <article class="card"><header><h3>&Eacute;quilibre de la charge</h3></header><div class="bullets" id="balance"></div></article>
+    <article class="card"><header><h3>&Eacute;quilibre de la charge</h3><span id="balance-date" style="margin-left:auto;color:var(--mute);font-size:.78rem"></span></header><div class="bullets" id="balance"></div></article>
   </div>
 
   <article class="card s4 full-m">
@@ -545,6 +545,7 @@ function renderLoad(){
   const items=[['anaerobic','Anaérobie','#8b5cf6'],['aerobic_high','Aérobie élevée','#f59e0b'],['aerobic_low','Aérobie faible','#22b8cf']].filter(([k])=>b[k]);
   const SL={within:'dans la plage optimale',below:'sous la plage optimale',above:'au-dessus de la plage optimale'};
   $('#balance').innerHTML='';
+  $('#balance-date').textContent=b.date?`au ${fmtDY(b.date)}`:'';
   items.forEach(([k,name,col],i)=>{
     const v=b[k],host=document.createElement('div');host.className='bullet';
     host.innerHTML=`<div class="l"><span>${name}</span><span class="num">${f0(v.load)} · ${SL[v.status]||v.status} (${f0(v.target_min)}–${f0(v.target_max)})</span></div><div id="bl${i}"></div>`;
