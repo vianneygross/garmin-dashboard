@@ -255,7 +255,7 @@ footer{margin-top:18px;color:var(--mute-2);font-size:.74rem;line-height:1.5}
   </article>
 
   <article class="card s3">
-    <header><h3>Sommeil</h3><span class="legend"><span class="key" style="color:var(--ochre)"><i class="box"></i>&lt; 7 h</span><span>30 nuits</span></span></header>
+    <header><h3>Sommeil</h3><span class="legend"><span class="key" style="color:var(--ochre)"><i class="box"></i>&lt; 7 h</span><span id="sleep-n">30 nuits</span></span></header>
     <div class="grow" id="c-sleep" role="img" aria-label="Dur&eacute;e de sommeil par nuit"></div>
   </article>
 
@@ -563,16 +563,17 @@ function renderLoad(){
 const HST={BALANCED:'équilibrée',UNBALANCED:'déséquilibrée',LOW:'basse',POOR:'mauvaise'};
 function renderRec(){
   const H=(D.hrv||[]).filter(r=>r.last_night_avg_hrv_ms!=null&&inRange(r.date,Math.min(rangeDays||150,150)));
-  const S=D.sleep||[];
+  const S=(D.sleep||[]).filter(x=>inRange(x.date));
   const p=[];
+  $('#sleep-n').textContent=`${S.length} nuit${S.length>1?'s':''}`;
   if(H.length){
     const l=H[H.length-1];
     p.push(`VFC de la dernière nuit : <b>${l.last_night_avg_hrv_ms} ms</b>, moyenne sur 7 jours <b>${l.weekly_avg_hrv_ms} ms</b>, plage ${HST[l.status]||(l.status||'').toLowerCase()}.`);
   }
   if(S.length){
-    const a7=avg(S.slice(-7).map(s=>s.sleep_hours)),a30=avg(S.map(s=>s.sleep_hours)),sc=avg(S.slice(-7).filter(s=>s.sleep_score).map(s=>s.sleep_score));
-    p.push(`Sommeil : <b>${f1(a7)} h</b> en moyenne sur 7 nuits (${f1(a30)} h sur 30), score moyen ${f0(sc)}.`);
-    p.push(`~${S.filter(s=>s.sleep_hours<7).length} nuit${S.filter(s=>s.sleep_hours<7).length>1?'s':''} sous 7 h sur les ${S.length} dernières.`);
+    const sc=avg(S.filter(s=>s.sleep_score).map(s=>s.sleep_score)),low=S.filter(s=>s.sleep_hours<7).length;
+    p.push(`Sommeil : <b>${f1(avg(S.map(s=>s.sleep_hours)))} h</b> en moyenne sur ${S.length} nuit${S.length>1?'s':''}${isNaN(sc)?'':`, score moyen ${f0(sc)}`}.`);
+    p.push(`~${low} nuit${low>1?'s':''} sous 7 h sur ${S.length}.`);
   }
   prose('#rec-text',p);
   mount('#c-hrv',150,(svg,w,h)=>{
